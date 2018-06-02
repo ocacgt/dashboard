@@ -1,0 +1,6 @@
+# Ignore Rstudio project files
+.Rproj.user
+.Rhistory
+
+# Ignore credential storage
+.httr-oauth
