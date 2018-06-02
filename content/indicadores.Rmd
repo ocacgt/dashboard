@@ -81,9 +81,11 @@ if(knitr::is_html_output()){
 }
 ```
 
-
-<img src="../img/placeholder.svg" width=800 height=600></img>
-
+<iframe
+  width="560" height="315" align="center"
+  src="https://www.youtube.com/embed/lSOih66hQz8"
+  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+</iframe>
 
 
 **Indicadores del acoso callejero** {.storyboard}
