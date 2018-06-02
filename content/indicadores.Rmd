@@ -51,14 +51,14 @@ knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
 
 ```{r utils}
 # Load utility functions
-source(file = "scripts/helpers.R")
+source(file = "scripts/helpers.R", encoding = "UTF-8")
 ```
 
 
 
 ```{r load_data, include=FALSE}
 # Data preprocessing script
-source(file = "scripts/get-data.R")
+source(file = "scripts/get-data.R", encoding = "UTF-8")
 ```
 
 
