@@ -800,7 +800,7 @@ g <- dashboard_calle %>%
     title = "Figura 11:\nEfecto según el tipo de acoso.",
     subtitle = paste(
       "Por el diseño de este estudio, no sabemos",
-      "el efecto que produce cada tipo de acoso,",1
+      "el efecto que produce cada tipo de acoso,",
       "pero podemos ver que los más reportados",
       "(\"piropos\", \"echadas de mano\" y \"silbidos\")",
       "se encuentran junto con reportes que indican",
