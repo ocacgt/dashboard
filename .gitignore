@@ -4,3 +4,8 @@
 
 # Ignore credential storage
 .httr-oauth
+
+# Ignore folders with private or irrelevant information
+data/
+docs/
+img/
