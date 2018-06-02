@@ -21,7 +21,6 @@ linkcolor: blue
 ```{r setup, include=FALSE}
 # Load used packages`
 library(package = "tidyverse")
-library(package = "dygraphs")
 library(package = "leaflet")
 
 # Theme palette
