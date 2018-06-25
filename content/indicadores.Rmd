@@ -830,8 +830,7 @@ plot(g)
 ### **¡Ayúdanos reportanto el acoso!**
 
 
-<iframe src="https://docs.google.com/forms/d/1Mm4PFaq_xnrHusNqgoliOAt5sj4kVxCQ82PiJdYDRcE/viewform?embedded=true" style="width:100%; height:100%;">Visita nuestros estudios en <a href="http://ocacgt.org/">http://ocacgt.org/</a>
-</iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSexOIYKwH_xT3jPECQq2UjkJa4egkUgnhR_cVtk1Z15IayZ0Q/viewform?embedded=true" style="width:100%; height:100%;">Cargando…</iframe>
 
 
 
