@@ -81,11 +81,31 @@ if(knitr::is_html_output()){
 }
 ```
 
+
+<style>
+.videoWrapper {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 */
+	padding-top: 25px;
+	height: 0;
+}
+.videoWrapper iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+</style>
+
+
+<div class="videoWrapper">
 <iframe
   width="560" height="315" align="center"
   src="https://www.youtube.com/embed/NkrRpN_5GIo"
   frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
 </iframe>
+</div>
 
 
 **Indicadores del acoso callejero** {.storyboard}
