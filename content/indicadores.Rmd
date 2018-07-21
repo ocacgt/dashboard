@@ -6,6 +6,9 @@ output:
     css: ../lib/ocacgt.css
   pdf_document: default
 linkcolor: blue
+header-includes:
+  - \usepackage{caption}
+  - \captionsetup[table]{labelformat=empty}
 ---
 
 
