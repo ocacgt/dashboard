@@ -1409,7 +1409,7 @@ Escríbenos a hola@ocacgt.org.
 if(knitr::is_html_output()){
   setDownloadURI = function(
     filename = stop("'filename' must be specified"),
-    textHTML = "aquí.", fileext = "pdf", envir = parent.frame()
+    textHTML = " ", fileext = "pdf", envir = parent.frame()
   ){
     
     require(base64enc,quietly = TRUE)
@@ -1433,7 +1433,7 @@ if(knitr::is_html_output()){
     var div = document.getElementById('",divname,"');
     div.appendChild(a);
     a.setAttribute('href', '",uri,"');
-    a.innerHTML = '",textHTML,"' + ' (",filenameWithExt,")';
+    a.innerHTML = '",textHTML,"' + ' ",filenameWithExt,"';
     if (typeof a.download != 'undefined') {
       a.setAttribute('download', '",filenameWithExt,"');
     }else{
@@ -1462,9 +1462,10 @@ if(knitr::is_html_output()){
   #   clean = TRUE
   # )
   cat("\n\n### Descargar informe de los estudios\n\n")
-  cat("**Informe descargable:** ")
-  cat("Puedes descargar una versión en pdf ")
-  setDownloadURI(filename = "content/reporte")
+  cat("**Informe descargable:** \n\n")
+  cat("Descargar versión de impresión de ambos estudios: ")
+  cat("![](../img/pdf-download.svg?display=inline-block)")
+  setDownloadURI(filename = "ocacgt-informeMapeo")
   cat(".")
 }
 ```

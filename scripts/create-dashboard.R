@@ -6,7 +6,7 @@
 rmarkdown::render(
   input = "content/indicadores.Rmd",
   output_format = "pdf_document",
-  output_file = "reporte.pdf",
+  output_file = "../ocacgt-informeMapeo.pdf",
   quiet = TRUE,
   clean = TRUE,
   encoding = "UTF8"
@@ -16,7 +16,7 @@ rmarkdown::render(
 rmarkdown::render(
   input = "content/indicadores.Rmd",
   output_format = "word_document",
-  output_file = "reporte.docx",
+  output_file = "../ocacgt-informeMapeo.docx",
   quiet = TRUE,
   clean = TRUE,
   encoding = "UTF8"
