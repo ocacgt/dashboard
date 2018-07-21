@@ -1304,70 +1304,6 @@ La violencia contra las mujeres y las niñas es evitable y puede ser detenida me
 
 
 
-<!-- Bloques para preparar y agregar el reporte -->
-```{r}
-if(knitr::is_html_output()){
-  setDownloadURI = function(
-    filename = stop("'filename' must be specified"),
-    textHTML = "aquí.", fileext = "pdf", envir = parent.frame()
-  ){
-    
-    require(base64enc,quietly = TRUE)
-    divname = paste(sample(LETTERS),collapse="")
-    
-    filenameWithExt = paste(filename,fileext,sep=".")
-    
-    # Encode the report file
-    uri = dataURI(
-      file = filenameWithExt,
-      mime = "application/octet-stream", encoding = "base64"
-    )
-    
-    # # Delete report file
-    # file.remove(filenameWithExt)
-    
-    # Write download script
-    cat("<a style='text-decoration: none' id='",divname,"'></a>
-    <script>
-    var a = document.createElement('a');
-    var div = document.getElementById('",divname,"');
-    div.appendChild(a);
-    a.setAttribute('href', '",uri,"');
-    a.innerHTML = '",textHTML,"' + ' (",filenameWithExt,")';
-    if (typeof a.download != 'undefined') {
-      a.setAttribute('download', '",filenameWithExt,"');
-    }else{
-      a.setAttribute('onclick', 'confirm(\"Tu navegador no es compatible con esta función. Debes cambiar el nombre del archivo a ",filenameWithExt," después de descargarlo (o usar Chrome/Firefox/Opera). \")');
-    }
-    </script>",
-    sep="")
-  }
-}
-```
-
-
-
-```{r results='asis', echo=FALSE, message=FALSE}
-if(knitr::is_html_output()){
-  # # Allow duplicate chunk labels, since knitting within self
-  # options(knitr.duplicate.label = "allow")
-  # 
-  # 
-  # # Knit and render to pdf
-  # rmarkdown::render(
-  #   input = "content/indicadores.Rmd",
-  #   output_format = "pdf_document",
-  #   output_file = "reporte.pdf",
-  #   quiet = TRUE,
-  #   clean = TRUE
-  # )
-  cat("**Informe descargable:** ")
-  cat("Puedes descargar una versión en pdf ")
-  setDownloadURI(filename = "content/reporte")
-  cat(".")
-}
-```
-
 
 </span>
 
@@ -1463,3 +1399,69 @@ En total hemos registrado `r nrow(dashboard_transporte)` reportes.
 
 Escríbenos a hola@ocacgt.org.
 
+
+
+<!-- Bloques para preparar y agregar el reporte -->
+```{r}
+if(knitr::is_html_output()){
+  setDownloadURI = function(
+    filename = stop("'filename' must be specified"),
+    textHTML = "aquí.", fileext = "pdf", envir = parent.frame()
+  ){
+    
+    require(base64enc,quietly = TRUE)
+    divname = paste(sample(LETTERS),collapse="")
+    
+    filenameWithExt = paste(filename,fileext,sep=".")
+    
+    # Encode the report file
+    uri = dataURI(
+      file = filenameWithExt,
+      mime = "application/octet-stream", encoding = "base64"
+    )
+    
+    # # Delete report file
+    # file.remove(filenameWithExt)
+    
+    # Write download script
+    cat("<a style='text-decoration: none' id='",divname,"'></a>
+    <script>
+    var a = document.createElement('a');
+    var div = document.getElementById('",divname,"');
+    div.appendChild(a);
+    a.setAttribute('href', '",uri,"');
+    a.innerHTML = '",textHTML,"' + ' (",filenameWithExt,")';
+    if (typeof a.download != 'undefined') {
+      a.setAttribute('download', '",filenameWithExt,"');
+    }else{
+      a.setAttribute('onclick', 'confirm(\"Tu navegador no es compatible con esta función. Debes cambiar el nombre del archivo a ",filenameWithExt," después de descargarlo (o usar Chrome/Firefox/Opera). \")');
+    }
+    </script>",
+    sep="")
+  }
+}
+```
+
+
+
+```{r results='asis', echo=FALSE, message=FALSE}
+if(knitr::is_html_output()){
+  # # Allow duplicate chunk labels, since knitting within self
+  # options(knitr.duplicate.label = "allow")
+  # 
+  # 
+  # # Knit and render to pdf
+  # rmarkdown::render(
+  #   input = "content/indicadores.Rmd",
+  #   output_format = "pdf_document",
+  #   output_file = "reporte.pdf",
+  #   quiet = TRUE,
+  #   clean = TRUE
+  # )
+  cat("\n\n### Descargar informe de los estudios\n\n")
+  cat("**Informe descargable:** ")
+  cat("Puedes descargar una versión en pdf ")
+  setDownloadURI(filename = "content/reporte")
+  cat(".")
+}
+```
