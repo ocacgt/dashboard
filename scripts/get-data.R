@@ -2,6 +2,9 @@
 # Get data from online questionnaires
 #------------------------------------------------------------------------------*
 
+# Load used packages
+library(package = "tidyverse")
+
 
 
 #------------------------------------------------------------------------------*
@@ -55,12 +58,25 @@ harassment_frequencies <- c(
 #------------------------------------------------------------------------------*
 
 
-# Set a snapshot file
-form_snapshot <- "data/form-snapshot.RData"
+# Use archive
+use_archived <- TRUE
 
-if(!file.exists(form_snapshot)){
+# Set a snapshot files
+calle_archive <- "data/archive_calle.rds"
+transporte_archive <- "data/archive_transporte.rds"
+calle_snapshot <- "data/datos_calle.rds"
+transporte_snapshot <- "data/datos_transpote.rds"
+
+
+if(use_archived & file.exists(calle_archive) & file.exists(transporte_archive)){
+  # Read archived
+  datos_calle <- readRDS(file = calle_archive)
+  datos_transporte <- readRDS(file = transporte_archive)
+} else {
   # Load used package
   library(package = googlesheets)
+  
+  # Formularios anteriores ----
   
   # Formulario acoso callejero
   datos_calle <- gs_title(x = "Mapeo del acoso callejero en Guatemala (respuestas)") %>%
@@ -70,9 +86,32 @@ if(!file.exists(form_snapshot)){
   datos_transporte <- gs_title(x = "Acoso Callejero en el Transporte Público (respuestas)") %>%
     gs_read()
   
-  save(datos_calle, datos_transporte, file = form_snapshot)
+  # Archivar los datos anteriores
+  saveRDS(datos_calle, file = calle_archive)
+  saveRDS(datos_transporte, file = transporte_archive)
+}
+
+
+if(file.exists(calle_snapshot) & file.exists(transporte_snapshot)){
+  # Formularios nuevos ----
+  datos_calle_nuevo <- readRDS(file = calle_snapshot)
+  datos_transporte_nuevo <- readRDS(file = transporte_snapshot)
 } else {
-  load(file = form_snapshot)
+  # Formulario acoso callejero
+  datos_calle_nuevo <- gs_title(
+    x = "formulario-MapeoAcosoCallejeroGt_2018 (Respuestas)"
+  ) %>%
+    gs_read()
+  
+  # Formulario acoso en el transporte público
+  datos_transporte_nuevo <- gs_title(
+    x = "formulario-AcosoCallejeroTransportePublico-2018 (Respuestas)"
+  ) %>%
+    gs_read()
+  
+  # Guardar un snapshot de los datos
+  saveRDS(datos_calle_nuevo, file = calle_snapshot)
+  saveRDS(datos_transporte_nuevo, file = transporte_snapshot)
 }
 
 
