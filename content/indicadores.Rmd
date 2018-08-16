@@ -122,7 +122,7 @@ if(knitr::is_html_output()){
 Explóralo para ver los lugares donde más ocurre,
 y también donde has vivido el acoso para asegurarte de que esté reportado.
 Si ves que un lugar en particular no ha sido reportado,
-te invitamos a <a href="https://docs.google.com/forms/d/e/1FAIpQLSexOIYKwH_xT3jPECQq2UjkJa4egkUgnhR_cVtk1Z15IayZ0Q/viewform" target="_blank">llenar este formulario</a>
+te invitamos a <a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_blank">llenar este formulario</a>
 para actualizar esta información.
 
 
@@ -853,7 +853,10 @@ plot(g)
 ### **¡Ayúdanos reportanto el acoso!**
 
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSexOIYKwH_xT3jPECQq2UjkJa4egkUgnhR_cVtk1Z15IayZ0Q/viewform?embedded=true" style="width:100%; height:100%;">Cargando…</iframe>
+Denuncia acoso callejero en calles, parques y otros espacios públicos aquí:
+<a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_blank">
+</br><img src="../img/dashboard-btn_mapeoAcoso.png"></img>
+</a>
 
 
 
@@ -1260,7 +1263,10 @@ dashboard_transporte %>%
 
 ### **¡Ayúdanos reportanto el acoso en el transporte público!**
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdqQuJa_VMgAPuq4KkxgTKl0SupnelBfRLSf_Ej3APTD8UmKQ/viewform?embedded=true" style="width:100%; height:100%;" frameborder="0" marginheight="0" marginwidth="0">Visita nuestros estudios en <a href="http://ocacgt.org/">http://ocacgt.org/</a></iframe>
+Denuncia acoso callejero en el transporte público aquí:
+<a href="http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/" target="_blank">
+</br><img src="../img/dashboard-btn_acosoTransporte.png"></img>
+</a>
 
 
 
