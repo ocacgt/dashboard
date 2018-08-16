@@ -9,3 +9,10 @@
 data/
 docs/
 img/
+
+# Ignore output files
+*.html
+*.pdf
+*.doc*
+*.tex
+*.zip
