@@ -16,3 +16,6 @@ img/
 *.doc*
 *.tex
 *.zip
+
+# Ignore R scripts - have to explicitly add
+*.R
