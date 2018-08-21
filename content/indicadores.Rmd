@@ -9,6 +9,12 @@ linkcolor: blue
 header-includes:
   - \usepackage{caption}
   - \captionsetup[table]{labelformat=empty}
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \setlength\headheight{26pt} 
+  - \fancyhead[LO,LE]{\includegraphics[width=3cm]{../img/ocacgt_logo_header.png}}
+  - \fancyfoot[CO,CE]{Observatorio Contra el Acoso Callejero Guatemala, www.ocacgt.org}
+  - \fancyfoot[LE,RO]{\thepage}
 ---
 
 
