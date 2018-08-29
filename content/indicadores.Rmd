@@ -410,19 +410,28 @@ ages_counts <- ages_table %>%
 <!-- Tab links -->
 <div>
 <span style="color:#999999"><b>Tabla 1:</b> Reportes de acoso por grupo de edad, para cada sexo.</span>
-<ul class="nav nav-tabs">
-<li class="active"><a data-toggle="tab" href="#e-mujeres">Mujeres</a></li>
-<li><a data-toggle="tab" href="#e-hombres">Hombres</a></li>
-</ul>
+
+```{r, results='asis'}
+if(knitr::is_html_output()){
+  cat(
+    '<ul class="nav nav-tabs">',
+    '<li class="active"><a data-toggle="tab" href="#e-mujeres">Mujeres</a></li>',
+    '<li><a data-toggle="tab" href="#e-hombres">Hombres</a></li>',
+    '</ul>',
+    sep = "\n"
+  )
+}
+```
+
 </div>
 
 <!-- Tab contents -->
 <div class="tab-content">
   <div id="e-mujeres" class="tab-pane fade in active">
-  `r knitr::kable(ages_counts$mujeres)`
+  `r knitr::kable(ages_counts$mujeres, caption = "**Mujeres**")`
   </div>
   <div id="e-hombres" class="tab-pane fade">
-  `r knitr::kable(ages_counts$hombres)`
+  `r knitr::kable(ages_counts$hombres, caption = "**Hombres**")`
   </div>
 </div>
 
@@ -628,19 +637,29 @@ types_counts <- harassment_counts %>%
 <!-- Tab links -->
 <div>
 <span style="color:#999999"><b>Tabla 2:</b> Reportes de tipo de acoso para cada sexo.</span>
-<ul class="nav nav-tabs">
-<li class="active"><a data-toggle="tab" href="#ta-mujeres">Mujeres</a></li>
-<li><a data-toggle="tab" href="#ta-hombres">Hombres</a></li>
+
+```{r, results='asis'}
+if(knitr::is_html_output()){
+  cat(
+    '<ul class="nav nav-tabs">',
+    '<li class="active"><a data-toggle="tab" href="#ta-mujeres">Mujeres</a></li>',
+    '<li><a data-toggle="tab" href="#ta-hombres">Hombres</a></li>',
+    '</ul>',
+    sep = "\n"
+  )
+}
+```
+
 </ul>
 </div>
 
 <!-- Tab contents -->
 <div class="tab-content">
   <div id="ta-mujeres" class="tab-pane fade in active">
-  `r knitr::kable(types_counts$Mujer)`
+  `r knitr::kable(types_counts$Mujer, caption = "**Mujeres**")`
   </div>
   <div id="ta-hombres" class="tab-pane fade">
-  `r knitr::kable(types_counts$Hombre)`
+  `r knitr::kable(types_counts$Hombre, caption = "**Hombres**")`
   </div>
 </div>
 
