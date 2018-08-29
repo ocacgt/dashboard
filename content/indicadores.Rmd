@@ -121,7 +121,7 @@ if(knitr::is_html_output()){
 ================================================
 
 
-### **¿En dónde ocurre al acoso?**</br>El acoso callejero ocurre principalmente en las calles, seguido del [transporte público](#estudio-de-acoso-en-el-transporte-publico).
+### **¿En dónde ocurre al acoso?** </br>El acoso callejero ocurre principalmente en las calles, seguido del [transporte público](#estudio-de-acoso-en-el-transporte-publico).
 
 
 `r if(knitr::is_html_output()) "En el mapa de abajo" else "En el mapa disponible en el dashboard (http://mapeo.ocacgt.org/indicadores.html)"`  puedes observar el lugar donde ocurrió cada reporte de acoso recibido en este estudio.
@@ -241,7 +241,7 @@ dashboard_calle %>%
 
 
 
-### **¿A quiénes afecta el acoso callejero?**</br>Quienes principalmente viven el acoso callejero son las mujeres.
+### **¿A quiénes afecta el acoso callejero?** </br>Quienes principalmente viven el acoso callejero son las mujeres.
 
 ```{r}
 # Harassed sex
@@ -306,7 +306,7 @@ En total hemos recibido
 
 
 
-### **¿A cuáles grupos de edad afecta?**</br>La mayoría de las personas acosadas son mujeres entre `r ages` años de edad.
+### **¿A cuáles grupos de edad afecta?** </br>La mayoría de las personas acosadas son mujeres entre `r ages` años de edad.
 
 ```{r}
 dashboard_calle %>%
@@ -436,7 +436,7 @@ if(knitr::is_html_output()){
 </div>
 
 
-### **¿Quiénes perpetran el acoso callejero?**</br> Según los casos reportados, los hombres son quienes más realizan prácticas de acoso (`r harassers$hombre`%), con relación a los casos registrados de mujeres acosadoras (`r harassers$mujer`%).
+### **¿Quiénes perpetran el acoso callejero?** </br> Según los casos reportados, los hombres son quienes más realizan prácticas de acoso (`r harassers$hombre`%), con relación a los casos registrados de mujeres acosadoras (`r harassers$mujer`%).
 
 ```{r}
 dashboard_calle %>%
@@ -529,7 +529,7 @@ dashboard_calle %>%
 
 
 
-### **¿Cuáles son los tipos de acoso más reportados?**</br>El tipo de acoso más reportado es el llamado piropo, que son expresiones no solicitadas y violentas.
+### **¿Cuáles son los tipos de acoso más reportados?** </br>El tipo de acoso más reportado es el llamado piropo, que son expresiones no solicitadas y violentas.
 
 ```{r}
 # Count types
@@ -673,7 +673,7 @@ representan juntos el 100%.
 
 
 
-### **¿Qué tan frecuente es el acoso callejero?**</br>El acoso callejero es reportado muchas veces, y típicamente sucede más de una vez al día.
+### **¿Qué tan frecuente es el acoso callejero?** </br>El acoso callejero es reportado muchas veces, y típicamente sucede más de una vez al día.
 
 ```{r}
 g <- dashboard_calle %>%
@@ -767,7 +767,7 @@ plot(g)
 
 
 
-### **¿Cuáles efectos tiene el acoso?**</br>Las personas que han vivido el acoso callejero reportan enojo, indignación y frustración.
+### **¿Cuáles efectos tiene el acoso?** </br>Las personas que han vivido el acoso callejero reportan enojo, indignación y frustración.
 
 ```{r}
 g <- dashboard_calle %>%
@@ -900,7 +900,7 @@ ages <- dashboard_transporte %>%
 
 
 
-### **¿A cuáles grupos de edad afecta?**</br>La mayoría de las mujeres acosadas en el transporte público tenían entre `r ages` años de edad.
+### **¿A cuáles grupos de edad afecta?** </br>La mayoría de las mujeres acosadas en el transporte público tenían entre `r ages` años de edad.
 
 ```{r}
 g <- dashboard_transporte %>%
@@ -993,7 +993,7 @@ ages_table %>%
 
 
 
-### **¿Qué tan frecuente es el acoso en el transporte público?**</br>Las mujeres reportan principalmente que han sido acosadas muchas veces en el transporte público.
+### **¿Qué tan frecuente es el acoso en el transporte público?** </br>Las mujeres reportan principalmente que han sido acosadas muchas veces en el transporte público.
 
 ```{r}
 g <- dashboard_transporte %>%
@@ -1074,7 +1074,7 @@ dashboard_transporte %>%
 
 
 
-### **¿Cuáles son los tipos de acoso más reportados?**</br>Los tipos de acoso más reportados en el transporte público son `r common_types`.
+### **¿Cuáles son los tipos de acoso más reportados?** </br>Los tipos de acoso más reportados en el transporte público son `r common_types`.
 
 ```{r}
 g <- dashboard_transporte %>%
@@ -1142,7 +1142,7 @@ representan juntos el 100%.
 
 
 
-### **¿Cómo responden las mujeres ante el acoso en el transporte público?**</br>Las principales reacciones al acoso son alejarse del acosador y defenderse sola.
+### **¿Cómo responden las mujeres ante el acoso en el transporte público?** </br>Las principales reacciones al acoso son alejarse del acosador y defenderse sola.
 
 ```{r}
 g <- dashboard_transporte %>%
