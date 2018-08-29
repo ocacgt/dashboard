@@ -520,7 +520,7 @@ dashboard_calle %>%
 
 
 
-### **¿Cuáles son los tipos de acoso más reportados?**</br>El tipo de acoso más reportado es el llamado "piropo", que son expresiones no solicitadas y violentas.
+### **¿Cuáles son los tipos de acoso más reportados?**</br>El tipo de acoso más reportado es el llamado piropo, que son expresiones no solicitadas y violentas.
 
 ```{r}
 # Count types
@@ -725,7 +725,7 @@ g <- dashboard_calle %>%
       "Por el diseño de este estudio, no sabemos",
       "la frecuencia con que sucede cada tipo de",
       "acoso, pero podemos ver que se reporta mucho",
-      "\"piropos\", \"echadas de mano\" y \"silbidos\"",
+      "piropos, echadas de mano y silbidos",
       "junto con reportes que indican que el acoso es",
       "muy frecuente.",
       sep = "\n"
@@ -832,7 +832,7 @@ g <- dashboard_calle %>%
       "Por el diseño de este estudio, no sabemos",
       "el efecto que produce cada tipo de acoso,",
       "pero podemos ver que los más reportados",
-      "(\"piropos\", \"echadas de mano\" y \"silbidos\")",
+      "(piropos, echadas de mano y silbidos)",
       "se encuentran junto con reportes que indican",
       "que el acoso produce enojo, indignación y",
       "frustración:",
