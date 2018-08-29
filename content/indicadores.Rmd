@@ -880,7 +880,7 @@ plot(g)
 
 Denuncia acoso callejero en calles, parques y otros espacios públicos aquí:
 <a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_blank">
-</br><img src="../img/dashboard-btn_mapeoAcoso.png"></img>
+</br><img src="../img/dashboard-btn_mapeoAcoso.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero/</img>
 </a>
 
 
@@ -1290,7 +1290,7 @@ dashboard_transporte %>%
 
 Denuncia acoso callejero en el transporte público aquí:
 <a href="http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/" target="_blank">
-</br><img src="../img/dashboard-btn_acosoTransporte.png"></img>
+</br><img src="../img/dashboard-btn_acosoTransporte.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/</img>
 </a>
 
 
