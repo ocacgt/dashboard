@@ -124,7 +124,7 @@ if(knitr::is_html_output()){
 ### **¿En dónde ocurre al acoso?**</br>El acoso callejero ocurre principalmente en las calles, seguido del [transporte público](#estudio-de-acoso-en-el-transporte-publico).
 
 
-`r if(knitr::is_html_output()) "En el mapa de abajo" else "En el mapa disponible en el dashboard"`  puedes observar el lugar donde ocurrió cada reporte de acoso recibido en este estudio.
+`r if(knitr::is_html_output()) "En el mapa de abajo" else "En el mapa disponible en el dashboard (http://mapeo.ocacgt.org/indicadores.html)"`  puedes observar el lugar donde ocurrió cada reporte de acoso recibido en este estudio.
 Explóralo para ver los lugares donde más ocurre,
 y también donde has vivido el acoso para asegurarte de que esté reportado.
 Si ves que un lugar en particular no ha sido reportado,
