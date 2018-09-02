@@ -4,6 +4,9 @@ output:
     logo: ../img/logo-white.svg
     social: menu
     css: ../lib/ocacgt.css
+    fig_mobile:
+      - 3.75
+      - 6.1
   pdf_document: default
 linkcolor: blue
 header-includes:
