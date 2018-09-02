@@ -1221,7 +1221,7 @@ reaction_table %>%
 ```
 
 
-### **Tipo de transporte**</br>El tipo de transporte más reportado como lugar de acoso son los buses urbanos, seguidos del transmetro.
+### **Tipo de transporte** </br>El tipo de transporte más reportado como lugar de acoso son los buses urbanos, seguidos del transmetro.
 
 
 En la tabla 5 puedes ver el número de casos de acoso reportados en cada tipo de transporte, y el porcentaje de reportes que lo mencionaban.
@@ -1265,7 +1265,7 @@ representan juntos el 100%.
 
 
 
-### **Ruta de denuncia**</br>`r text_knows`
+### **Ruta de denuncia** </br>`r text_knows`
 
 En la tabla 6 puedes ver el número (y porcentaje) de mujeres que reportan conocer la ruta de denuncia según la frecuencia con que son acosadas.
 
