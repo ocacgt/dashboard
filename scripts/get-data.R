@@ -97,6 +97,9 @@ if(file.exists(calle_snapshot) & file.exists(transporte_snapshot)){
   datos_calle_nuevo <- readRDS(file = calle_snapshot)
   datos_transporte_nuevo <- readRDS(file = transporte_snapshot)
 } else {
+  # Load used package
+  library(package = googlesheets)
+  
   # Formulario acoso callejero
   datos_calle_nuevo <- gs_title(
     x = "formulario-MapeoAcosoCallejeroGt_2018 (Respuestas)"
