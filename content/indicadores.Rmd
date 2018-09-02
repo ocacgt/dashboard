@@ -702,7 +702,8 @@ g <- dashboard_calle %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name == "title"] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 ```
 
 ***
@@ -760,7 +761,8 @@ g <- dashboard_calle %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name %in% c("title", "subtitle")] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 ```
 
 
@@ -811,7 +813,8 @@ g <- dashboard_calle %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name == "title"] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 ```
 
 ***
@@ -869,7 +872,8 @@ g <- dashboard_calle %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name %in% c("title", "subtitle")] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 ```
 
 
@@ -941,7 +945,8 @@ g <- dashboard_transporte %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name == "title"] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 
 # Summarize ages
 ages_table <- dashboard_transporte %>%
@@ -1018,7 +1023,8 @@ g <- dashboard_transporte %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name == "title"] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 
 common_types <- dashboard_transporte %>%
   unnest(harassment_type_simp) %>%
@@ -1101,7 +1107,8 @@ g <- dashboard_transporte %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name == "title"] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 ```
 
 ***
@@ -1173,7 +1180,8 @@ g <- dashboard_transporte %>%
 
 g <- ggplotGrob(g)
 g$layout$l[g$layout$name == "title"] <- 1
-plot(g)
+grid::grid.newpage()
+grid::grid.draw(g)
 
 
 reaction_table <- dashboard_transporte %>%
