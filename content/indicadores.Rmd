@@ -428,10 +428,10 @@ if(knitr::is_html_output()){
 <!-- Tab contents -->
 <div class="tab-content">
   <div id="e-mujeres" class="tab-pane fade in active">
-  `r knitr::kable(ages_counts$mujeres, caption = "**Mujeres**")`
+  `r kable(ages_counts$mujeres, caption = "**Mujeres**")`
   </div>
   <div id="e-hombres" class="tab-pane fade">
-  `r knitr::kable(ages_counts$hombres, caption = "**Hombres**")`
+  `r kable(ages_counts$hombres, caption = "**Hombres**")`
   </div>
 </div>
 
@@ -656,10 +656,10 @@ if(knitr::is_html_output()){
 <!-- Tab contents -->
 <div class="tab-content">
   <div id="ta-mujeres" class="tab-pane fade in active">
-  `r knitr::kable(types_counts$Mujer, caption = "**Mujeres**")`
+  `r kable(types_counts$Mujer, caption = "**Mujeres**")`
   </div>
   <div id="ta-hombres" class="tab-pane fade">
-  `r knitr::kable(types_counts$Hombre, caption = "**Hombres**")`
+  `r kable(types_counts$Hombre, caption = "**Hombres**")`
   </div>
 </div>
 
@@ -991,7 +991,7 @@ ages_table %>%
     "Reportes de acoso" = n,
     "Porcentaje del total" = percent
   ) %>%
-  knitr::kable(
+  kable(
     caption = "**Tabla 1:** Grupos de edad afectados por el acoso en el transporte público"
   )
 ```
@@ -1134,7 +1134,7 @@ dashboard_transporte %>%
     "Reportes de acoso" = n,
     "Porcentaje del total" = percent
   ) %>%
-  knitr::kable(
+  kable(
     caption = "**Tabla 3:** Frecuencia de cada tipo de acoso"
   )
 ```
@@ -1215,7 +1215,7 @@ reaction_table %>%
     "Número de casos" = n,
     "Porcentaje del total de reportes" = p
   ) %>%
-  knitr::kable(
+  kable(
     caption = "**Tabla 4:** Frecuencia de cada tipo de reacción frente al acoso"
   )
 ```
@@ -1241,7 +1241,7 @@ dashboard_transporte %>%
     "Número de casos" = n,
     "Porcentaje del total de reportes" = p
   ) %>%
-  knitr::kable(
+  kable(
     caption = "**Tabla 5:** Frecuencia de cada tipo de transporte reportado como lugar del acoso."
   )
 
@@ -1409,7 +1409,7 @@ dashboard_calle %>%
   ) %>%
   summarize_all(funs(sum)) %>%
   gather(key = "Categoría", value = "Total", factor_key = TRUE) %>%
-  knitr::kable(
+  kable(
     caption = "**Tabla 1:** Total de reportes por categoría"
   )
 ```

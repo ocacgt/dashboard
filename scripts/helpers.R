@@ -1,3 +1,26 @@
+# Function to highlight the top n rows
+kable <- function(.tbl, top = 3, ...){
+  .tbl %>%
+    mutate(
+      marker = select_if(., .predicate = is.numeric) %>%
+        unlist() %>%
+        min_rank() %>%
+        magrittr::is_greater_than(n() - top)
+    ) %>%
+    mutate_all(
+      funs(
+        if_else(
+          condition = marker,
+          true = paste0("**", ., "**"),
+          false = as.character(.)
+        )
+      )
+    ) %>%
+    select(-marker) %>%
+    knitr::kable(...)
+}
+
+
 plot_square_waffle <- function(.data, variable, label, colors = NULL, reverse = FALSE){
   variable <- enquo(variable)
   col <- pull(.data, !! variable)
