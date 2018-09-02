@@ -229,6 +229,26 @@ dashboard_calle_anterior <- datos_calle %>%
 
 # Datos calle - cuestonario nuevo
 dashboard_calle_nuevo <- datos_calle_nuevo %>%
+  mutate(
+    department = Departamento,
+    municipality = `Municipio del Departamento de Guatemala`,
+    zone = `Zona de la Ciudad de Guatemala`,
+    harassment_location = paste0(
+      ifelse(
+        !is.na(Avenida),
+        paste0(gsub(" *avenida *", "", Avenida, ignore.case = TRUE), " avenida "),
+        ""
+      ),
+      ifelse(
+        !is.na(Calle),
+        paste0(gsub(" *calle *", "", Calle, ignore.case = TRUE), " calle "),
+        ""
+      ),
+      ifelse(!is.na(zone), paste0(zone, " "), ""),
+      ifelse(!is.na(municipality), paste0(municipality, ", "), ""),
+      ifelse(!is.na(department), department, "")
+    )
+  ) %>%
   select(
     timestamp = `Marca temporal`,
     reporter_gender = Sexo,
@@ -237,6 +257,8 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
     reporter_effect = `¿Qué sentiste?`,
     harasser_sex = `En el incidente de acoso, la persona acosadora era:`,
     harasser_age = `¿Qué edad aproximada dirías que tiene la persona acosadora?`,
+    harassment_location,
+    department, municipality, zone,
     harassment_place = `Tipo de lugar`,
     harassment_type = `Tipos de acoso`,
     harassment_frequency = `¿Cada cuánto tiempo sufres alguna forma de acoso?`
