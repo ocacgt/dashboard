@@ -124,8 +124,8 @@ if(file.exists(calle_snapshot) & file.exists(transporte_snapshot)){
 # Prepare used variables ----
 #------------------------------------------------------------------------------*
 
-# Acoso callejero
-dashboard_calle <- datos_calle %>%
+# Acoso callejero - cuestionario anterior
+dashboard_calle_anterior <- datos_calle %>%
   select(
     timestamp = `Marca temporal`,
     reporter_gender = Género,
@@ -227,8 +227,114 @@ dashboard_calle <- datos_calle %>%
   )
 
 
+# Datos calle - cuestonario nuevo
+dashboard_calle_nuevo <- datos_calle_nuevo %>%
+  select(
+    timestamp = `Marca temporal`,
+    reporter_gender = Sexo,
+    reporter_orientation = `Orientación sexual`,
+    reporter_age = `Edad (en años)`,
+    reporter_effect = `¿Qué sentiste?`,
+    harasser_sex = `En el incidente de acoso, la persona acosadora era:`,
+    harasser_age = `¿Qué edad aproximada dirías que tiene la persona acosadora?`,
+    harassment_place = `Tipo de lugar`,
+    harassment_type = `Tipos de acoso`,
+    harassment_frequency = `¿Cada cuánto tiempo sufres alguna forma de acoso?`
+  ) %>%
+# Fix coding
+  mutate(
+    timestamp = lubridate::dmy_hms(timestamp),
+    harassment_date = timestamp %>% as.Date(),
+    # Consistent category for sex
+    reporter_sex = recode(
+      reporter_gender,
+      "Femenino" = "Mujer",
+      "Masculino" = "Hombre"
+    ),
+    # Recode additional category
+    harasser_sex = recode(
+      harasser_sex,
+      "Masculino" = "Hombre"
+    ),
+    # Order harasser ages
+    harasser_age = recode_factor(
+      harasser_age,
+      "Menor de 18 años" = "< 18",
+      "19 - 24" = "19 - 24",
+      "25 - 29" = "25 - 29",
+      "30 - 34" = "30 - 34",
+      "35 - 39" = "35 - 39",
+      "40 - 44" = "40 - 44",
+      "Mayor de 45 años" = "> 45",
+      "No sé" = "No sé",
+      .ordered = TRUE
+    ),
+    # Process multiple answers
+    harassment_type_rec = tolower(harassment_type) %>%
+      # Fix pre specified instances of separator
+      gsub(".+(piropos).*", "\\1", .) %>%
+      gsub(",( no consentidas| directos)", "\\1", .) %>%
+      strsplit(split = ", *") %>%
+      map(~ifelse(!.x %in% harassment_types, "otro", .x)),
+    reporter_effect_rec = tolower(reporter_effect) %>%
+      strsplit(split = ", *") %>%
+      map(~ifelse(!.x %in% harassment_effects, "otro", .x)),
+    harassment_place_rec = harassment_place %>%
+      tolower() %>%
+      recode(
+        calle = "avenidas/calles"
+      ) %>%
+      ifelse(
+        ! . %in% harassment_places, last(harassment_places), .
+      ) %>%
+      factor(levels = harassment_places, ordered = TRUE),
+    # Fix ages
+    reporter_age = reporter_age %>%
+      gsub(" ?a[ñn]os?", "", .) %>%
+      recode(
+        "veinte y cuatro" = "24",
+        "veintiuno" = "21"
+      ) %>%
+      as.integer(),
+    # Fix frequencies
+    harassment_frequency = harassment_frequency %>%
+      iconv(to = "ASCII//TRANSLIT") %>%
+      gsub("ano", "año", .) %>%
+      recode(
+        "Semanalmente" = "1 vez a la semana",
+        "Mensualmente" = "1 par de veces al mes",
+        "Diariamente" = "Una vez al dia",
+        "Un par de veces en el año" = "Pocas veces al año"
+      ) %>%
+      factor(levels = harassment_frequencies, ordered = TRUE)
+  )
+
+
+# Join both old and new dataset ----
+dashboard_calle <- dashboard_calle_anterior %>%
+  bind_rows(dashboard_calle_nuevo)
+
+
 # Manual data check
 if(interactive()){
+  # Compare available variables in new and old dataset
+  list(
+    mutate(dashboard_calle_anterior, .set = "old"),
+    mutate(dashboard_calle_nuevo, .set = "new")
+  ) %>%
+    map(
+      ~ .x %>%
+        slice(1) %>%
+        mutate_at(
+          vars(-matches(".set")),
+          funs(paste(class(.), collapse = ";"))
+        )
+    ) %>%
+    bind_rows() %>%
+    gather(variable, class, -.set) %>%
+    spread(.set, class) %>%
+    print(n = Inf)
+  
   dashboard_calle %>%
     select(
       -harassment_type, -harassment_location, -harassment_place, -harassment_time,
