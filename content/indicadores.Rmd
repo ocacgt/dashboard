@@ -135,71 +135,76 @@ te invitamos a <a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_bl
 para actualizar esta información.
 
 
-```{r include=knitr::is_html_output()}
-# Set tile options
-base_tiles <- "carto-light"
-
-tiles <- frame_data(
-  ~tile,         ~url,
-  "wikimedia",   "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
-  "transport",   "http://{s}.tile.opencyclemap.org/transport/{z}/{x}/{y}.png",
-  "carto-toner", "http://a.tile.stamen.com/toner/{z}/{x}/{y}.png",
-  "carto-light", "http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-)
-
-if(!base_tiles %in% tiles$tile){
-  tiles <- tiles %>%
-    bind_rows(
-      data_frame(
-        tile = base_tiles,
-        url = paste0("http://{s}.api.cartocdn.com/", base_tiles, "/{z}/{x}/{y}.png")
+```{r fig.width=8, fig.height=8.5}
+if(knitr::is_html_output()){
+  # Set tile options
+  base_tiles <- "carto-light"
+  
+  tiles <- frame_data(
+    ~tile,         ~url,
+    "wikimedia",   "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
+    "transport",   "http://{s}.tile.opencyclemap.org/transport/{z}/{x}/{y}.png",
+    "carto-toner", "http://a.tile.stamen.com/toner/{z}/{x}/{y}.png",
+    "carto-light", "http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+  )
+  
+  if(!base_tiles %in% tiles$tile){
+    tiles <- tiles %>%
+      bind_rows(
+        data_frame(
+          tile = base_tiles,
+          url = paste0("http://{s}.api.cartocdn.com/", base_tiles, "/{z}/{x}/{y}.png")
+        )
       )
+  }
+  
+  
+  # Set map options
+  map_options <- list(
+    minZoom = 7,
+    maxZoom = 15
+  )
+  
+  # Draw map
+  locations %>%
+    mutate(
+      label = paste0(as.Date(timestamp), "</br>", harassment_location)
+    ) %>%
+    leaflet(width = "100%", height = "100%") %>% # width = "100%", height = "100%"
+    setMaxBounds(
+      lat1 = set_names(gt_bbox$ymin, NULL),
+      lng1 = set_names(gt_bbox$xmin, NULL),
+      lat2 = set_names(gt_bbox$ymax, NULL),
+      lng2 = set_names(gt_bbox$xmax, NULL)
+    ) %>%
+    fitBounds(
+      lat1 = set_names(gt_bbox$ymin, NULL) - 0.06,
+      lng1 = set_names(gt_bbox$xmin, NULL) + 0.01,
+      lat2 = set_names(gt_bbox$ymax, NULL) + 0.06,
+      lng2 = set_names(gt_bbox$xmax, NULL) - 0.01
+    ) %>%
+    addTiles(
+      urlTemplate = tiles[tiles$tile==base_tiles,]$url,
+      options = map_options
+    ) %>%
+    addCircleMarkers(
+      lng = ~lon, lat = ~lat, popup = ~label,
+      clusterOptions = markerClusterOptions(),
+      radius = 6,
+      labelOptions = labelOptions(textOnly = FALSE),
+      options = popupOptions(closeButton = FALSE)
+    ) %>%
+    addControl(
+      htmltools::span(
+        htmltools::tag("b", "Figura 1:"),
+        "Mapa de casos reportados"
+      ),
+      position = "topright"
     )
+} else {
+  plot(static_map)
 }
 
-
-# Set map options
-map_options <- list(
-  minZoom = 7,
-  maxZoom = 15
-)
-
-# Draw map
-locations %>%
-  mutate(
-    label = paste0(as.Date(timestamp), "</br>", harassment_location)
-  ) %>%
-  leaflet(width = "100%", height = "100%") %>% # width = "100%", height = "100%"
-  setMaxBounds(
-    lat1 = set_names(gt_bbox$ymin, NULL),
-    lng1 = set_names(gt_bbox$xmin, NULL),
-    lat2 = set_names(gt_bbox$ymax, NULL),
-    lng2 = set_names(gt_bbox$xmax, NULL)
-  ) %>%
-  fitBounds(
-    lat1 = set_names(gt_bbox$ymin, NULL) - 0.06,
-    lng1 = set_names(gt_bbox$xmin, NULL) + 0.01,
-    lat2 = set_names(gt_bbox$ymax, NULL) + 0.06,
-    lng2 = set_names(gt_bbox$xmax, NULL) - 0.01
-  ) %>%
-  addTiles(
-    urlTemplate = tiles[tiles$tile==base_tiles,]$url,
-    options = map_options
-  ) %>%
-  addCircleMarkers(
-    lng = ~lon, lat = ~lat, popup = ~label,
-    clusterOptions = markerClusterOptions(),
-    radius = 6,
-    labelOptions = labelOptions(textOnly = FALSE),
-    options = popupOptions(closeButton = FALSE)
-  ) %>%
-  addControl(
-    htmltools::span(
-      htmltools::tag("b", "Figura 1:"),
-      "Mapa de casos reportados"
-    ),
-    position = "topright"
-  )
 ```
 
 
