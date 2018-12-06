@@ -159,24 +159,12 @@ if(knitr::is_html_output()){
   }
   
   
-  # Set map options
-  map_options <- list(
-    minZoom = 7,
-    maxZoom = 15
-  )
-  
   # Draw map
   locations %>%
     mutate(
       label = paste0(as.Date(timestamp), "</br>", harassment_location)
     ) %>%
     leaflet(width = "100%", height = "100%") %>% # width = "100%", height = "100%"
-    setMaxBounds(
-      lat1 = set_names(gt_bbox$ymin, NULL),
-      lng1 = set_names(gt_bbox$xmin, NULL),
-      lat2 = set_names(gt_bbox$ymax, NULL),
-      lng2 = set_names(gt_bbox$xmax, NULL)
-    ) %>%
     fitBounds(
       lat1 = set_names(gt_bbox$ymin, NULL) - 0.06,
       lng1 = set_names(gt_bbox$xmin, NULL) + 0.01,
@@ -184,8 +172,7 @@ if(knitr::is_html_output()){
       lng2 = set_names(gt_bbox$xmax, NULL) - 0.01
     ) %>%
     addTiles(
-      urlTemplate = tiles[tiles$tile==base_tiles,]$url,
-      options = map_options
+      urlTemplate = tiles[tiles$tile==base_tiles,]$url
     ) %>%
     addCircleMarkers(
       lng = ~lon, lat = ~lat, popup = ~label,
