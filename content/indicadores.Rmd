@@ -552,7 +552,7 @@ harassment_counts <- dashboard_calle %>%
   ungroup() %>%
   mutate(
     harassment_type_rec = harassment_type_rec %>%
-      fct_reorder(times, fun = sum) %>%
+      fct_reorder(times, .fun = sum) %>%
       fct_reorder(. != "otro")
   ) %>%
   arrange(reporter_sex, desc(harassment_type_rec))
@@ -610,7 +610,7 @@ types_counts <- harassment_counts %>%
   mutate(
     harassment_type_rec =  harassment_type_rec %>%
       factor() %>%
-      fct_reorder(times, fun = sum) %>%
+      fct_reorder(times, .fun = sum) %>%
       fct_reorder(. != "otro")
   ) %>%
   arrange(reporter_sex, desc(times)) %>%
@@ -676,7 +676,7 @@ g <- dashboard_calle %>%
   count(reporter_sex, harassment_frequency) %>%
   mutate(
     harassment_frequency = harassment_frequency %>%
-      fct_reorder(n, fun = sum)
+      fct_reorder(n, .fun = sum)
   ) %>%
   ggplot() +
   geom_col(
@@ -708,7 +708,7 @@ grid::grid.draw(g)
 g <- dashboard_calle %>%
   select(reporter_sex, harassment_type_rec, harassment_frequency) %>%
   rownames_to_column() %>%
-  unnest(harassment_type_rec, .drop = FALSE) %>%
+  unnest(harassment_type_rec) %>%
   # Top 3 harassment types
   top(harassment_type_rec, n = 3) %>%
   #top(harassment_frequency, 3) %>%
@@ -786,7 +786,7 @@ g <- dashboard_calle %>%
   ungroup() %>%
   mutate(
     reporter_effect_rec = reporter_effect_rec %>%
-      fct_reorder(times, fun = sum) %>%
+      fct_reorder(times, .fun = sum) %>%
       fct_reorder(. != "otro")
   ) %>%
   ggplot() +
@@ -819,7 +819,7 @@ grid::grid.draw(g)
 g <- dashboard_calle %>%
   select(reporter_sex, harassment_type_rec, reporter_effect_rec) %>%
   rownames_to_column() %>%
-  unnest(harassment_type_rec, .drop = FALSE) %>%
+  unnest(harassment_type_rec) %>%
   # Top 3 harassment types
   top(harassment_type_rec, n = 3) %>%
   unnest(reporter_effect_rec) %>%
