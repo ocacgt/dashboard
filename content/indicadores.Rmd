@@ -1,4 +1,5 @@
 ---
+title: 'Indicadores de Acoso Callejero'
 output:
   flexdashboard::flex_dashboard:
     logo: ../img/logo-white.svg
