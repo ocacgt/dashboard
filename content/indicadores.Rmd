@@ -368,9 +368,9 @@ ages_table <- dashboard_calle %>%
     age_group = paste(pmax(start, min_age), end, sep = " a "),
     percent = as.integer(round(n / sum(n) * 100, 0))
   ) %>%
-  ungroup %>%
+  ungroup() %>%
   complete(
-    reporter_sex, age_group,
+    nesting(reporter_sex, age_group),
     fill = list(n = 0, percent = 0)
   )
 ```
