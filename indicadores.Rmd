@@ -2,9 +2,9 @@
 title: 'Indicadores de Acoso Callejero'
 output:
   flexdashboard::flex_dashboard:
-    logo: ../img/logo-white.svg
+    logo: img/logo-white.svg
     social: menu
-    css: ../lib/ocacgt.css
+    css: lib/ocacgt.css
     fig_mobile:
       - 3.75
       - 6.1
@@ -16,7 +16,7 @@ header-includes:
   - \usepackage{fancyhdr}
   - \pagestyle{fancy}
   - \setlength\headheight{26pt} 
-  - \fancyhead[LO,LE]{\includegraphics[width=3cm]{../img/ocacgt_logo_header.png}}
+  - \fancyhead[LO,LE]{\includegraphics[width=3cm]{img/ocacgt_logo_header.png}}
   - \fancyfoot[CO,CE]{Observatorio Contra el Acoso Callejero Guatemala, www.ocacgt.org}
   - \fancyfoot[LE,RO]{\thepage}
 ---
@@ -57,7 +57,6 @@ theme_set(
 )
 
 # Configure knitting
-knitr::opts_knit$set(root.dir = "..")
 knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
 ```
 
@@ -344,6 +343,7 @@ dashboard_calle %>%
 
 # Summarize ages
 ages_table <- dashboard_calle %>%
+  filter(!is.na(reporter_age)) %>%
   mutate(
     age_group = cut(
       reporter_age,
@@ -880,7 +880,7 @@ grid::grid.draw(g)
 
 Denuncia acoso callejero en calles, parques y otros espacios públicos aquí:
 <a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_blank">
-</br><img src="../img/dashboard-btn_mapeoAcoso.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero/</img>
+</br><img src="img/dashboard-btn_mapeoAcoso.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero/</img>
 </a>
 
 
@@ -1294,7 +1294,7 @@ dashboard_transporte %>%
 
 Denuncia acoso callejero en el transporte público aquí:
 <a href="http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/" target="_blank">
-</br><img src="../img/dashboard-btn_acosoTransporte.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/</img>
+</br><img src="img/dashboard-btn_acosoTransporte.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/</img>
 </a>
 
 
@@ -1311,7 +1311,7 @@ Denuncia acoso callejero en el transporte público aquí:
 
 <!-- Logo OCACGT centrado -->
 <span width="100%">
-<a href="http://ocacgt.org/" target="_blank"><img src="../img/ocacgt_logo_header.png" width="295px" height="100px"
+<a href="http://ocacgt.org/" target="_blank"><img src="img/ocacgt_logo_header.png" width="295px" height="100px"
 style="display: block; margin-left: auto; margin-right: auto;"
 alt="Observatorio contra el acoso callejero – Guatemala"></a>
 </span>
@@ -1319,7 +1319,8 @@ alt="Observatorio contra el acoso callejero – Guatemala"></a>
 
 ```{r results='asis', out.width="1\\linewidth"}
 if(!knitr::is_html_output()){
-  knitr::include_graphics("../img/ocacgt_logo_header.png")
+  cat(getwd(), file = "log")
+  knitr::include_graphics("img/ocacgt_logo_header.png")
 }
 ```
 
@@ -1349,12 +1350,12 @@ La violencia contra las mujeres y las niñas es evitable y puede ser detenida me
 <!-- Logos de otros socios -->
 <!-- <span width="100%" style="position: absolute; bottom: 0;"> -->
 <span width="100%">
-<img src="../img/partners.png" width="100%"></img>
+<img src="img/partners.png" width="100%"></img>
 </span>
 
 ```{r results='asis', out.width="1\\linewidth"}
 if(!knitr::is_html_output()){
-  knitr::include_graphics("../img/partners.png")
+  knitr::include_graphics("img/partners.png")
 }
 ```
 
@@ -1499,7 +1500,7 @@ if(knitr::is_html_output()){
   cat("\n\n### Descargar informe de los estudios\n\n")
   cat("**Informe descargable:** \n\n")
   cat("Descargar versión de impresión de ambos estudios: ")
-  cat("![](../img/pdf-download.svg?display=inline-block)")
+  cat("![](img/pdf-download.svg?display=inline-block)")
   setDownloadURI(filename = "ocacgt-informeMapeo")
   cat(".")
 }
