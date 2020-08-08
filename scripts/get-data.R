@@ -200,16 +200,16 @@ dashboard_calle_anterior <- datos_calle %>%
     harassment_date = lubridate::dmy(harassment_date),
     # Fix times
     harassment_time_rec = ifelse(
-      test = is.na(hms::as.hms(harassment_time)),
+      test = is.na(hms::as_hms(harassment_time)),
       yes = harassment_time %>%
         tolower() %>%
         ifelse(! . %in% harassment_times, "otro", .),
       # Fixed periods
       no = case_when(
-        hms::as.hms(harassment_time) < hms::as.hms("06:00:00") ~ "madrugada",
-        hms::as.hms(harassment_time) < hms::as.hms("12:00:00") ~ "mañana",
-        hms::as.hms(harassment_time) < hms::as.hms("18:00:00") ~ "tarde",
-        hms::as.hms(harassment_time) < hms::as.hms("23:59:59") ~ "noche"
+        hms::as_hms(harassment_time) < hms::as_hms("06:00:00") ~ "madrugada",
+        hms::as_hms(harassment_time) < hms::as_hms("12:00:00") ~ "mañana",
+        hms::as_hms(harassment_time) < hms::as_hms("18:00:00") ~ "tarde",
+        hms::as_hms(harassment_time) < hms::as_hms("23:59:59") ~ "noche"
       )
     ) %>%
       factor(., levels = harassment_times, ordered = TRUE),
