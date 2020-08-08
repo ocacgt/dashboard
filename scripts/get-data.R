@@ -393,7 +393,7 @@ dashboard_transporte <- datos_transporte %>%
     harassment_type_simp = lapply(
       harassment_type_rec,
       function(.x) {
-        data_frame(
+        tibble(
           .x = .x,
           type = case_when(
             grepl("ofensivas", .x) ~ "insultos",
