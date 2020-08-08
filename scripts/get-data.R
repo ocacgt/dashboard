@@ -265,7 +265,7 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
     harassment_type = `Tipos de acoso`,
     harassment_frequency = `¿Cada cuánto tiempo sufres alguna forma de acoso?`
   ) %>%
-# Fix coding
+  # Fix coding
   mutate(
     timestamp = lubridate::dmy_hms(timestamp),
     harassment_date = timestamp %>% as.Date(),
@@ -284,11 +284,11 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
     harasser_age = recode_factor(
       harasser_age,
       "Menor de 18 años" = "< 18",
-      "19 - 24" = "19 - 24",
-      "25 - 29" = "25 - 29",
-      "30 - 34" = "30 - 34",
-      "35 - 39" = "35 - 39",
-      "40 - 44" = "40 - 44",
+      "19-24" = "19 - 24",
+      "25-29" = "25 - 29",
+      "30-34" = "30 - 34",
+      "35-39" = "35 - 39",
+      "40-44" = "40 - 44",
       "Mayor de 45 años" = "> 45",
       "No sé" = "No sé",
       .ordered = TRUE
