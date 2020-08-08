@@ -1016,7 +1016,7 @@ if(knitr::is_html_output()){
     leaflet::addControl(
       htmltools::span(
         htmltools::tag("b", "Figura 1:"),
-        "Mapa de casos reportados"
+        "Mapa de casos reportados en el campus central"
       ),
       position = "topright"
     )
@@ -1064,7 +1064,6 @@ if(knitr::is_html_output()){
 
 ```{r fig.width=8, fig.height=8.5}
 
-set.seed(1)
 cum_cases <- ref %>%
   filter(!is.na(name)) %>%
   separate_rows(name, sep = ";") %>%
@@ -1079,133 +1078,23 @@ cum_cases <- ref %>%
     sf_column_name = "geometry"
   ) %>%
   filter(!sf::st_is_empty(geometry)) %>%
-  mutate(
-    point = map2(
-      geometry, name,
-      ~ {
-        sf::st_sample(.x, size = 1)
-      }
-    ) %>%
-      purrr::flatten() %>%
-      sf::st_sfc()
-  )
+  as_tibble() %>%
+  count(name)
 
 
-if(knitr::is_html_output()){
-  
-  cum_bbox <- sf::st_bbox(limits_cum) %>%
-    unclass() %>%
-    as.list()
-  
-  cum_cases %>%
-    mutate(
-      label = paste0(as.Date(marcatemporal), "</br>", name)
-    ) %>%
-    sf::st_set_geometry("point") %>%
-    leaflet::leaflet(width = "100%", height = "100%") %>%
-    leaflet::addTiles(
-      options = leaflet::tileOptions(maxZoom = 22),
-      urlTemplate = tiles[tiles$tile==base_tiles,]$url
-    ) %>%
-    leaflet::fitBounds(
-      lat1 = set_names(cum_bbox$ymin, NULL) - 0.002,
-      lng1 = set_names(cum_bbox$xmin, NULL) + 0.001,
-      lat2 = set_names(cum_bbox$ymax, NULL) + 0.002,
-      lng2 = set_names(cum_bbox$xmax, NULL) - 0.001
-    ) %>%
-    leaflet::addPolygons(
-      data = limits_cum, color = "grey", fillOpacity = 0.1
-    ) %>%
-    leaflet::addPolygons(
-      data = buildings_cum, color = "black", fillOpacity = 0,
-      weight = 1,
-      label = ~name
-    ) %>% 
-    leaflet::addCircleMarkers(
-      label = ~name,
-      clusterOptions = leaflet::markerClusterOptions(),
-      radius = 6,
-      labelOptions = leaflet::labelOptions(textOnly = FALSE),
-      options = leaflet::popupOptions(closeButton = FALSE)
-    ) %>%
-    leaflet::addControl(
-      htmltools::span(
-        htmltools::tag("b", "Figura 2:"),
-        "Mapa de casos reportados en el CUM"
-      ),
-      position = "topright"
+ref %>%
+  count(unit, sort = TRUE) %>%
+  transmute(
+    "Unidad académica" = unit,
+    "n (%)" = paste0(
+      n, " (", round(n / sum(n) * 100, 1), ")"
     )
-
-} else {
-  static_cum_map <-  cum_cases %>%
-    count(name) %>%
-    ggplot() +
-    geom_sf(
-      data = buildings_cum
-    ) +
-    geom_sf(
-      aes(fill = n)
-    ) +
-    geom_sf(
-      data = cum_cases %>%
-        sf::st_set_geometry("point") %>%
-        sf::st_set_crs(4326),
-      size = 0.1, color = "red"
-    ) +
-    labs(
-      title = paste(
-        "Mapa mostrando las ubicaciones reportadas de acoso",
-        "\nen el Centro Universitario Metropolitano de USAC"
-      ),
-      fill = "Número de\nreportes"
-    ) +
-    scale_fill_viridis_c() +
-    theme(
-      legend.key.width = unit(2, "lines")
-    )
-  
-  plot(static_cum_map)
-}
-
-```
-
-
-
-
-```{r places_sample, fig.width=4, fig.height=4, eval=FALSE}
-
-dashboard_calle %>%
-  mutate(
-    harassment_place_rec = harassment_place_rec %>%
-      fct_relabel(
-        function(x) x %>%
-          gsub("( [(].+)|(cerca de )", "", .) %>%
-          gsub(".+(otros)", "otros", .) %>%
-          gsub(" (público|de buses)", "\n\\1", .)
-      )
   ) %>%
-  ggplot() +
-  geom_bar(
-    aes(x = harassment_place_rec), fill = ocacgt_pal["gris"]
-  ) +
-  labs(
-    title = "Figura 2:\nLugares donde es más\nfrecuente el acoso.",
-    subtitle = paste(
-      "El acoso ocurre en todas partes, pero hay",
-      "lugares en donde es más frecuente. En la",
-      "gráfica de abajo puedes ver los tipos de",
-      "lugares más reportados en este estudio.",
-      sep = "\n"
-    ),
-    x = "Tipo de lugar\ndonde ocurrió el acoso",
-    y = "Número de reportes"
-  ) +
-  scale_y_continuous(expand = c(0, 0)) +
-  # coord_flip() +
-  theme(
-    legend.position = "bottom",
-    axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5)
+  knitr::kable(
+    caption = "**Tabla 1:** Reportes de acoso según unidad académica"
   )
+
+
 ```
 
 
@@ -1232,7 +1121,7 @@ dashboard_usac %>%
     reverse = TRUE
   ) +
   labs(
-    title = "Figura x. Sexo de la persona acosada"
+    title = "Figura 2. Sexo de la persona acosada"
   )
 ```
 
@@ -1240,8 +1129,19 @@ dashboard_usac %>%
 
 ```{r}
 dashboard_usac %>%
+  mutate(
+    sexual_orientation = sexual_orientation %>%
+      tolower() %>%
+      recode_factor(
+        lesbiana = "homosexual",
+        homosexual = "homosexual",
+        bisexual = "bisexual",
+        heterosexual = "heterosexual",
+        .default = "otras diversidades"
+      )
+  ) %>%
   count(
-    "Orientación sexual" = tolower(sexual_orientation),
+    "Orientación sexual" = sexual_orientation,
     sort = TRUE
   ) %>%
   mutate(
@@ -1252,7 +1152,7 @@ dashboard_usac %>%
     "Porcentaje" = p
   ) %>%
   kable(
-    caption = "**Tabla n:** Orientación sexual de las personas acosadas."
+    caption = "**Tabla 2:** Orientación sexual de las personas acosadas."
   )
 
 ages <- dashboard_usac %>%
@@ -1294,7 +1194,7 @@ dashboard_usac %>%
     color = ocacgt_pal["blanco"], size = 0.3
   ) +
   labs(
-    title = "Figura x:\nNúmero de reportes por\nedad de persona acosada.",
+    title = "Figura 3:\nNúmero de reportes por\nedad de persona acosada.",
     x = "Edad en años",
     y = "Número de reportes",
     fill = "Sexo de la persona acosada"
@@ -1387,7 +1287,7 @@ ages_counts_usac <- ages_table_usac %>%
 
 <!-- Tab links -->
   
-<span style="color:#999999"><b>Tabla 1:</b> Reportes de acoso por grupo de edad, para cada sexo.</span>
+<span style="color:#999999"><b>Tabla 3:</b> Reportes de acoso por grupo de edad, para cada sexo.</span>
 
 
 ```{r, results='asis', eval=knitr::is_html_output()}
@@ -1439,7 +1339,7 @@ dashboard_usac %>%
     reverse = TRUE
   ) +
   labs(
-    title = "Figura x. Sexo de los perpetradores\nde acoso en USAC"
+    title = "Figura 4. Sexo de los perpetradores\nde acoso en USAC"
   ) +
   guides(
     fill = guide_legend(nrow = 1, title.position = "top")
@@ -1447,6 +1347,22 @@ dashboard_usac %>%
 ```
 
 ***
+
+```{r}
+dashboard_usac %>%
+  count(sexo, "Identidad del acosador" = harasser_known) %>%
+  group_by(sexo) %>%
+  mutate(
+    n = paste0(
+      n, " (", round(n / sum(n) * 100, 1), "%)"
+    )
+  ) %>%
+  spread(sexo, n, fill = "") %>%
+  knitr::kable(
+    caption = "**Tabla 4** Identidad del acusador según sexo de la persona acosada"
+  )
+```
+
 
 
 ### **¿Quiénes son los acosadores en USAC?** </br>En USAC, los acosadores a quienes se puede identificar son principalmente profesores y estudiantes.
@@ -1469,7 +1385,7 @@ dashboard_usac %>%
     reverse = TRUE
   ) +
   labs(
-    title = "Figura x. Función de los perpetradores\nde acoso en USAC"
+    title = "Figura 5. Función de los perpetradores\nde acoso en USAC"
   ) +
   guides(
     fill = guide_legend(nrow = 2, title.position = "top")
@@ -1493,7 +1409,7 @@ dashboard_usac %>%
     "Porcentaje" = p
   ) %>%
   kable(
-    caption = "**Tabla n:** Reincidencia de acosadores",
+    caption = "**Tabla 5:** Reincidencia de acosadores",
     top = 0
   )
 ```
@@ -1502,6 +1418,81 @@ dashboard_usac %>%
 
 
 ### **¿Cuáles son los tipos de acoso más reportados en USAC?** </br>Los tipos de acoso más reportados son las miradas lascivas, y el llamado piropo, que son expresiones no solicitadas y violentas.
+
+
+```{r}
+# Count types
+harassment_counts <- dashboard_usac %>%
+  separate_rows(tipos_de_acoso, sep = ";") %>%
+  select(
+    reporter_sex = sexo,
+    harassment_type_rec = tipos_de_acoso
+  ) %>%
+  rownames_to_column() %>%
+  group_by(reporter_sex) %>%
+  mutate(n = n()) %>%
+  unnest(harassment_type_rec) %>%
+  mutate(
+    harassment_type_rec = harassment_type_rec %>%
+      gsub("\"", "", .) %>%
+      gsub(" y graba.+", "", .) %>%
+      gsub(" con.+", "", .) %>%
+      gsub(" [(].+", "", .) %>%
+      gsub(" y ", " y\n", .)
+  ) %>%
+  group_by(reporter_sex, harassment_type_rec) %>%
+  summarize(
+    n = first(n),
+    times = n(),
+    percent = as.integer(round(times / first(n) * 100, 0))
+  ) %>%
+  ungroup() %>%
+  arrange(desc(times)) %>%
+  mutate(
+    harassment_type_rec = case_when(
+      grepl("Mantener una proxi", harassment_type_rec) ~ "invadir espacio personal",
+      grepl("Chistes y", harassment_type_rec) ~ "bromas obscenas frecuentes",
+      grepl("Se aprovecha de", harassment_type_rec) ~ "abusa situaciones académicas",
+      grepl("Comentarios sobre la su", harassment_type_rec) ~ "comentarios de vida sexual",
+      grepl("Intentar besar", harassment_type_rec) ~ "intenta besar",
+      grepl("El acosador acudió a terceras", harassment_type_rec) ~ "acoso por medio de terceros",
+      harassment_type_rec %in% harassment_type_rec[1:15] ~ harassment_type_rec,
+      TRUE ~ "otro"
+    )
+  ) %>%
+  mutate(
+    harassment_type_rec = harassment_type_rec %>%
+      fct_reorder(times, .fun = sum) %>%
+      fct_reorder(. != "otro")
+  ) %>%
+  arrange(reporter_sex, desc(harassment_type_rec))
+
+# Plot types
+g <- harassment_counts %>%
+  ggplot() +
+  geom_col(
+    aes(x = harassment_type_rec, y = times, fill = reporter_sex)
+  ) +
+  labs(
+    title = "Figura 6:\nFrecuencia de\ncada tipo de acoso.",
+    x = "Tipo de acoso",
+    y = "Número de reportes",
+    fill = "Sexo de la\npersona acosada"
+  ) +
+  scale_fill_manual(values = set_names(ocacgt_pal[c(1, 3, 2)], NULL)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  coord_flip() +
+  theme(
+    legend.position = c(1, 0),
+    legend.justification = c(1, -0.1)
+  )
+
+g <- ggplotGrob(g)
+g$layout$l[g$layout$name == "title"] <- 1
+grid::grid.newpage()
+grid::grid.draw(g)
+```
+
 
 ***
 
@@ -1518,7 +1509,7 @@ dashboard_usac %>%
     "Porcentaje" = p
   ) %>%
   kable(
-    caption = "**Tabla n:** Tipos de acoso"
+    caption = "**Tabla 6:** Tipos de acoso"
   )
 ```
 
@@ -1527,12 +1518,48 @@ dashboard_usac %>%
 
 ### **¿Qué tan frecuente es el acoso en USAC?** </br>Aunque el acoso es reportado muchas veces, y en la calle típicamente sucede más de una vez al día<bold>*</bold>, la frecuencia reportada en USAC es menor.
 
+
+```{r}
+g <- dashboard_usac %>%
+  count(
+    reporter_sex = sexo,
+    harassment_frequency = frecuencia_acoso
+  ) %>%
+  mutate(
+    harassment_frequency = harassment_frequency %>%
+      fct_reorder(n, .fun = sum)
+  ) %>%
+  ggplot() +
+  geom_col(
+    aes(x = harassment_frequency, y = n, fill = reporter_sex)
+  ) +
+  labs(
+    title = "Figura 7:\nNúmero de casos según\nfrecuencia de acoso.",
+    x = "Frecuencia del acoso",
+    y = "Número de reportes",
+    fill = "Sexo de la\npersona acosada"
+  ) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_manual(values = set_names(ocacgt_pal[c(1,3,2)], NULL)) +
+  coord_flip() +
+  theme(
+    legend.position = c(1, 0),
+    legend.justification = c(1, -0.1)
+  )
+
+g <- ggplotGrob(g)
+g$layout$l[g$layout$name == "title"] <- 1
+grid::grid.newpage()
+grid::grid.draw(g)
+```
+
+
 ***
 
 ```{r}
 dashboard_usac %>%
   separate_rows(frecuencia_acoso, sep = ";") %>%
-  count("Tipo de acoso" = frecuencia_acoso, sort = TRUE) %>%
+  count("Frecuencia de acoso" = frecuencia_acoso, sort = TRUE) %>%
   slice(1:15) %>%
   mutate(
     p = paste(round(n / sum(n) * 100, 1), "%")
@@ -1542,7 +1569,7 @@ dashboard_usac %>%
     "Porcentaje" = p
   ) %>%
   kable(
-    caption = "**Tabla n:** Frecuencia del acoso"
+    caption = "**Tabla 7:** Frecuencia del acoso"
   )
 ```
 
@@ -1550,6 +1577,61 @@ dashboard_usac %>%
 
 
 ### **¿Cuáles efectos tiene el acoso en USAC?** </br>Las personas que han vivido el acoso en USAC reportan incomodidad, enojo, e inseguridad.
+
+
+```{r}
+g <- dashboard_usac %>%
+  separate_rows(efecto_acoso, sep = ";") %>%
+  mutate(
+    efecto_acoso = efecto_acoso %>%
+      tolower() %>%
+      sub("[^a-z]+$", "", .)
+  ) %>%
+  select(
+    reporter_sex = sexo,
+    reporter_effect_rec = efecto_acoso
+  ) %>%
+  mutate(
+    reporter_effect_rec = case_when(
+      grepl(" ", reporter_effect_rec) ~ "otro",
+      TRUE ~ reporter_effect_rec
+    )
+  ) %>%
+  group_by(reporter_sex, reporter_effect_rec) %>%
+  summarize(
+    times = n(),
+    # percent = times / first(n)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    reporter_effect_rec = reporter_effect_rec %>%
+      fct_reorder(times, .fun = sum) %>%
+      fct_reorder(. != "otro")
+  ) %>%
+  ggplot() +
+  geom_col(
+    aes(x = reporter_effect_rec, y = times, fill = reporter_sex)
+  ) +
+  labs(
+    title = "Figura 8:\nEfecto del acoso en las personas.",
+    x = "Efecto sobre la persona acosada",
+    y = "Número de reportes",
+    fill = "Sexo de la\npersona acosada"
+  ) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_manual(values = set_names(ocacgt_pal[c(1, 3, 2)], NULL)) +
+  coord_flip() +
+  theme(
+    legend.position = c(1, 0),
+    legend.justification = c(1, -0.1)
+  )
+
+g <- ggplotGrob(g)
+g$layout$l[g$layout$name == "title"] <- 1
+grid::grid.newpage()
+grid::grid.draw(g)
+```
+
 
 ***
 
@@ -1571,7 +1653,7 @@ dashboard_usac %>%
     "Porcentaje" = p
   ) %>%
   kable(
-    caption = "**Tabla n:** Efecto del acoso"
+    caption = "**Tabla 8:** Efecto del acoso"
   )
 ```
 
