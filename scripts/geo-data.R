@@ -22,6 +22,25 @@ department_reports <- locations %>%
   # Add to departments data
   left_join(departments, y = .)
 
+
+
+# Using the report locations
+municipality_reports <- locations %>%
+  filter(!is.na(lon), !is.na(lat)) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  # Join with the department names using the coordinates (report in department)
+  st_join(municipalities) %>%
+  # Count departments
+  count(dept_id, municipality) %>%
+  # Rename report points geometry to preserve on joins
+  rename(reports = geometry) %>%
+  as.data.frame() %>% 
+  # Add to departments data
+  left_join(municipalities, y = .) %>%
+  arrange(desc(n))
+
+
+
 # Using the report locations
 zone_reports <- locations %>%
   filter(!is.na(lon), !is.na(lat)) %>%
@@ -88,6 +107,10 @@ static_zones_map <- zone_reports %>%
       st_set_geometry(value = "reports"),
     size = 0.3, fill = "red", color = "red"
   ) +
+  geom_sf_text(
+    data = zones,
+    aes(label = sub("Z ", "", zona))
+  ) +
   labs(
     title = "Figura 1b: Reportes por zona del municipio de Guatemala.",
     subtitle = paste(
@@ -107,10 +130,10 @@ static_zones_map <- zone_reports %>%
     breaks = 10 ^ seq(from = 0, to = 2, by = 1),
     labels = 10 ^ seq(from = 0, to = 2, by = 1)
   ) +
-  expand_limits(fill = c(1, 100)) +
+  expand_limits(
+    fill = c(1, 100)
+  ) +
   theme(
-    legend.position = c(0, 1),
-    legend.justification = c(-0.05, 1.05),
     plot.subtitle = element_text(face = "plain")
   )
 

@@ -208,6 +208,45 @@ if(knitr::is_html_output()){
 ```
 
 
+```{r, results='asis'}
+if(!knitr::is_html_output()){
+  cat(
+    "",
+    "",
+    "Como el municipio de Guatemala, departamento de Guatemala,",
+    "es el que cuenta con más de casos",
+    paste0(
+      "(",
+      municipality_reports %>%
+        as_tibble() %>%
+        summarize(
+          text = paste0(
+            n[municipality == "Guatemala"],
+            " de ",
+            sum(n, na.rm = TRUE),
+            " casos reportados con ubicación, ",
+            round(n[municipality == "Guatemala"] / sum(n, na.rm = TRUE) * 100, 1),
+            "%"
+          )
+        ),
+      ")"
+    ),
+    "en la figura 1b se muestra el detalle de casos por cada zona.",
+    "",
+    "",
+    sep = "\n"
+  )
+}
+```
+
+
+```{r}
+if(!knitr::is_html_output()){
+  plot(static_zones_map)
+}
+```
+
+
 ***
 
 ```{r places, fig.width=4, fig.height=4}
