@@ -19,6 +19,9 @@ header-includes:
   - \fancyhead[LO,LE]{\includegraphics[width=3cm]{img/ocacgt_logo_header.png}}
   - \fancyfoot[CO,CE]{Observatorio Contra el Acoso Callejero Guatemala, www.ocacgt.org}
   - \fancyfoot[LE,RO]{\thepage}
+  - \usepackage{pdflscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
 ---
 
 
@@ -131,7 +134,7 @@ if(knitr::is_html_output()){
 ================================================
 
 
-### **¿En dónde ocurre al acoso?** </br>El acoso callejero ocurre principalmente en las calles, seguido del [transporte público](#estudio-de-acoso-en-el-transporte-publico).
+### **¿En dónde ocurre al acoso?** </br>El acoso callejero ocurre principalmente en las calles, seguido del [transporte público](#estudio-de-acoso-en-el-transporte-público).
 
 
 `r if(knitr::is_html_output()) "En el mapa de abajo" else "En el mapa disponible en el dashboard (http://mapeo.ocacgt.org/indicadores.html)"`  puedes observar el lugar donde ocurrió cada reporte de acoso recibido en este estudio.
@@ -140,6 +143,9 @@ y también donde has vivido el acoso para asegurarte de que esté reportado.
 Si ves que un lugar en particular no ha sido reportado,
 te invitamos a <a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_blank">llenar este formulario</a>
 para actualizar esta información.
+
+
+\newpage
 
 
 ```{r fig.width=8, fig.height=8.5}
@@ -906,6 +912,8 @@ Denuncia acoso callejero en calles, parques y otros espacios públicos aquí:
 
 
 
+\newpage
+
 **Indicadores del acoso en USAC** {.storyboard}
 ================================================
 
@@ -919,6 +927,9 @@ Si ves que un lugar en particular no ha sido reportado,
 te invitamos a <a href="http://ocacgt.org/mapeo-de-acoso-usac/" target="_blank">llenar este formulario</a>
 para actualizar esta información.
 
+
+
+\newpage
 
 
 ```{r fig.width=8, fig.height=8.5}
@@ -1575,6 +1586,8 @@ Denuncia acoso callejero en USAC aquí:
 
 
 
+\newpage
+
 **Estudio de acoso en el transporte público** {.storyboard}
 ===========================================================
 
@@ -1997,6 +2010,8 @@ Denuncia acoso callejero en el transporte público aquí:
 
 
 
+\newpage
+
 **Acerca del proyecto**  {.storyboard}
 ================================================
 
@@ -2016,7 +2031,6 @@ alt="Observatorio contra el acoso callejero – Guatemala"></a>
 
 ```{r results='asis', out.width="1\\linewidth"}
 if(!knitr::is_html_output()){
-  cat(getwd(), file = "log")
   knitr::include_graphics("img/ocacgt_logo_header.png")
 }
 ```
