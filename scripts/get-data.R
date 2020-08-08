@@ -372,7 +372,7 @@ if(interactive()){
 
 
 # Acoso en transporte público
-dashboard_transporte <- datos_transporte %>%
+dashboard_transporte_anterior <- datos_transporte %>%
   select(
     timestamp = `Marca temporal`,
     reporter_age = `Edad (en años)`,
@@ -437,6 +437,79 @@ dashboard_transporte <- datos_transporte %>%
     # Fix dates
     timestamp = lubridate::dmy_hms(timestamp)
   )
+
+
+dashboard_transporte_nuevo <- datos_transporte_nuevo %>%
+  select(
+    timestamp = `Marca temporal`,
+    reporter_age = `Edad (en años)`,
+    times_harassed = `Durante toda tu vida, ¿Cuántas veces has sido víctima de acoso sexual callejero en el transporte público?`,
+    harassment_type = `¿Qué sucedió cuando sufriste acoso sexual callejero en el trasporte público?`,
+    reporter_reaction = `Comúnmente, cuando alguna de esas situaciones te ocurre ¿qué haces en el momento?`,
+    transport_type = `¿En qué tipo de transporte has sido víctima de acoso?`,
+    transport_route1 = `Líneas del Transmetro`,
+    transport_route2 = `Transurbano (Sur, Norte y otras)`,
+    transport_route3 = `Otras rutas o medios de transporte.`,
+    days_use = `¿Qué medio(s) de transporte usa con más frecuencia?`
+  ) %>%
+  # Fix coding
+  mutate(
+    # Process multiple answers
+    harassment_type_rec = tolower(harassment_type) %>%
+      strsplit(split = ", *"),
+    harassment_type_simp = lapply(
+      harassment_type_rec,
+      function(.x) {
+        data_frame(
+          .x = .x,
+          type = case_when(
+            grepl("ofensivas", .x) ~ "insultos",
+            grepl("piropos", .x) ~ "piropos",
+            grepl("fotos", .x) ~ "fotografías",
+            grepl("ataque", .x) ~ "intimidación",
+            grepl("morbosamente", .x) ~ "miradas lascivas",
+            grepl("genitales", .x) ~ "exhibicionismo",
+            grepl("le tocaron", .x) ~ "tocamientos o manoseos",
+            grepl("recargar", .x) ~ "recargarse encima",
+            grepl("manosearon", .x) ~ "masturbación"
+          )
+        ) %>%
+          pull(type)
+      }
+    ),
+    reporter_reaction = tolower(reporter_reaction) %>%
+      strsplit(split = ", *") %>%
+      map(~ifelse(!.x %in% transport_response_types, "otro", .x)) %>%
+      map(unique),
+    transport_type = transport_type %>%
+      sub("Extraurbanos San Juan", "extraurbanos", .) %>%
+      strsplit(split = ", *"),
+    # Order categories
+    times_harassed = factor(
+      times_harassed,
+      levels = c(
+        "Muchas veces", "Pocas veces", "Una vez", "Ninguna vez"
+      ),
+      ordered = TRUE
+    ),
+    # Fix ages
+    reporter_age = reporter_age %>%
+      gsub(" *a[ñn]os? *", "", .) %>%
+      recode(
+        "Veintitrés" = "23"
+      ) %>%
+      as.integer(),
+    # Fix dates
+    timestamp = lubridate::dmy_hms(timestamp)
+  ) %>%
+  print()
+
+
+dashboard_transporte <- dashboard_transporte_anterior %>%
+  bind_rows(
+    dashboard_transporte_nuevo
+  )
+
 
 
 

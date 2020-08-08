@@ -1225,8 +1225,8 @@ Los tipos de transporte más reportados como lugar de acoso fueron los buses urb
 
 ```{r}
 dashboard_transporte %>%
-    unnest(transport_type) %>%
-    count(transport_type) %>%
+  unnest(transport_type) %>%
+  count(transport_type) %>%
   mutate(
     p = round(n/nrow(dashboard_transporte) * 100)
   ) %>%
@@ -1268,6 +1268,13 @@ En la tabla 6 puedes ver el número (y porcentaje) de mujeres que reportan conoc
 ```{r}
 dashboard_transporte %>%
   count(knows_report, times_harassed) %>%
+  mutate(
+    knows_report = recode(
+      knows_report,
+      .missing = "No responde"
+    ) %>%
+      factor(levels = c("No", "Sí", "No responde"))
+  ) %>%
   spread(knows_report, n, fill = 0) %>%
   mutate_at(
     vars(-times_harassed),
@@ -1279,7 +1286,8 @@ dashboard_transporte %>%
     c(
       "Veces que ha sido acosada",
       "Total que no conoce la ruta de denuncia (%)",
-      "Total que sí conoce la ruta de denuncia (%)"
+      "Total que sí conoce la ruta de denuncia (%)",
+      "Total que no responde si conoce la ruta de denuncia (%)"
     )
   ) %>%
   knitr::kable(
