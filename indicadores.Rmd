@@ -34,6 +34,7 @@ header-includes:
 ```{r setup, include=FALSE}
 # Load used packages`
 library(package = "tidyverse")
+library(package = "patchwork")
 library(package = "leaflet")
 
 # Theme palette
@@ -71,6 +72,11 @@ source(file = "scripts/helpers.R", encoding = "UTF8")
 ```{r load_data, include=FALSE}
 # Data preprocessing script
 source(file = "scripts/get-data.R", encoding = "UTF8")
+
+# Data processing for USAC report
+source(file = "scripts/read-form-data.R", encoding = "UTF-8")
+source(file = "scripts/prepare-gis-data.R", encoding = "UTF-8")
+ref <- readxl::read_excel("output/locations_ref.xlsx")
 ```
 
 
@@ -900,6 +906,675 @@ Denuncia acoso callejero en calles, parques y otros espacios públicos aquí:
 
 
 
+**Indicadores del acoso en USAC** {.storyboard}
+================================================
+
+
+### **¿En dónde ocurre al acoso en USAC?** </br>El acoso callejero está reportado en toda la USAC.
+
+`r if(knitr::is_html_output()) "En el mapa de abajo" else "En el mapa disponible en el dashboard (http://mapeo.ocacgt.org/usac/mapa_exploratorio.html)"`  puedes observar el lugar donde ocurrió cada reporte de acoso recibido en el estudio de acoso de USAC.
+Explóralo para ver los lugares donde más ocurre,
+y también donde has vivido el acoso para asegurarte de que esté reportado.
+Si ves que un lugar en particular no ha sido reportado,
+te invitamos a <a href="http://ocacgt.org/mapeo-de-acoso-usac/" target="_blank">llenar este formulario</a>
+para actualizar esta información.
+
+
+
+```{r fig.width=8, fig.height=8.5}
+
+set.seed(1)
+cases <- ref %>%
+  filter(!is.na(name)) %>%
+  separate_rows(name, sep = ";") %>%
+  arrange(marcatemporal, name) %>%
+  select(marcatemporal, location, name) %>%
+  left_join(
+    buildings_usac %>%
+      select(name) %>%
+      as.data.frame()
+  ) %>%
+  sf::st_as_sf(
+    sf_column_name = "geometry"
+  ) %>%
+  filter(!sf::st_is_empty(geometry)) %>%
+  mutate(
+    point = map2(
+      geometry, name,
+      ~ {
+        sf::st_sample(.x, size = 1)
+      }
+    ) %>%
+      purrr::flatten() %>%
+      sf::st_sfc()
+  )
+
+
+if(knitr::is_html_output()){
+  # Set tile options
+  base_tiles <- "carto-light"
+  
+  tiles <- frame_data(
+    ~tile,         ~url,
+    "wikimedia",   "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
+    "transport",   "http://{s}.tile.opencyclemap.org/transport/{z}/{x}/{y}.png",
+    "carto-toner", "http://a.tile.stamen.com/toner/{z}/{x}/{y}.png",
+    "carto-light", "http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+  )
+  
+  if(!base_tiles %in% tiles$tile){
+    tiles <- tiles %>%
+      bind_rows(
+        data_frame(
+          tile = base_tiles,
+          url = paste0("http://{s}.api.cartocdn.com/", base_tiles, "/{z}/{x}/{y}.png")
+        )
+      )
+  }
+  
+  usac_bbox <- sf::st_bbox(limits) %>%
+    unclass() %>%
+    as.list()
+  
+  cases %>%
+    mutate(
+      label = paste0(as.Date(marcatemporal), "</br>", name)
+    ) %>%
+    sf::st_set_geometry("point") %>%
+    leaflet::leaflet(width = "100%", height = "100%") %>%
+    leaflet::addTiles(
+      options = leaflet::tileOptions(maxZoom = 19.9),
+      urlTemplate = tiles[tiles$tile==base_tiles,]$url
+    ) %>%
+    leaflet::fitBounds(
+      lat1 = set_names(usac_bbox$ymin, NULL) - 0.002,
+      lng1 = set_names(usac_bbox$xmin, NULL) + 0.001,
+      lat2 = set_names(usac_bbox$ymax, NULL) + 0.002,
+      lng2 = set_names(usac_bbox$xmax, NULL) - 0.001
+    ) %>%
+    leaflet::addPolygons(
+      data = limits, color = "grey", fillOpacity = 0.1
+    ) %>%
+    leaflet::addCircleMarkers(
+      label = ~name,
+      clusterOptions = leaflet::markerClusterOptions(),
+      radius = 6,
+      labelOptions = leaflet::labelOptions(textOnly = FALSE),
+      options = leaflet::popupOptions(closeButton = FALSE)
+    ) %>%
+    leaflet::addControl(
+      htmltools::span(
+        htmltools::tag("b", "Figura 1:"),
+        "Mapa de casos reportados"
+      ),
+      position = "topright"
+    )
+
+} else {
+  static_map <-  cases %>%
+    count(name) %>%
+    ggplot() +
+    geom_sf(
+      data = buildings_usac %>%
+        filter(!grepl("centro experimental docente", name, ignore.case = TRUE))
+    ) +
+    geom_sf(
+      aes(fill = n)
+    ) +
+    geom_sf(
+      data = cases %>%
+        sf::st_set_geometry("point") %>%
+        sf::st_set_crs(4326),
+      size = 0.1, color = "red"
+    ) +
+    labs(
+      title = paste(
+        "Mapa mostrando las ubicaciones reportadas de acoso",
+        "\nen el campus central de USAC"
+      ),
+      fill = "Número de\nreportes"
+    ) +
+    scale_fill_viridis_c() +
+    theme(
+      legend.position = c(1, 0.01),
+      legend.justification = c(1, 0),
+      legend.direction = "horizontal",
+      legend.key.width = unit(2, "lines")
+    )
+  
+  plot(static_map)
+}
+
+```
+
+
+***
+
+
+```{r fig.width=8, fig.height=8.5}
+
+set.seed(1)
+cum_cases <- ref %>%
+  filter(!is.na(name)) %>%
+  separate_rows(name, sep = ";") %>%
+  arrange(marcatemporal, name) %>%
+  select(marcatemporal, location, name) %>%
+  left_join(
+    buildings_cum %>%
+      select(name) %>%
+      as.data.frame()
+  ) %>%
+  sf::st_as_sf(
+    sf_column_name = "geometry"
+  ) %>%
+  filter(!sf::st_is_empty(geometry)) %>%
+  mutate(
+    point = map2(
+      geometry, name,
+      ~ {
+        sf::st_sample(.x, size = 1)
+      }
+    ) %>%
+      purrr::flatten() %>%
+      sf::st_sfc()
+  )
+
+
+if(knitr::is_html_output()){
+  
+  cum_bbox <- sf::st_bbox(limits_cum) %>%
+    unclass() %>%
+    as.list()
+  
+  cum_cases %>%
+    mutate(
+      label = paste0(as.Date(marcatemporal), "</br>", name)
+    ) %>%
+    sf::st_set_geometry("point") %>%
+    leaflet::leaflet(width = "100%", height = "100%") %>%
+    leaflet::addTiles(
+      options = leaflet::tileOptions(maxZoom = 22),
+      urlTemplate = tiles[tiles$tile==base_tiles,]$url
+    ) %>%
+    leaflet::fitBounds(
+      lat1 = set_names(cum_bbox$ymin, NULL) - 0.002,
+      lng1 = set_names(cum_bbox$xmin, NULL) + 0.001,
+      lat2 = set_names(cum_bbox$ymax, NULL) + 0.002,
+      lng2 = set_names(cum_bbox$xmax, NULL) - 0.001
+    ) %>%
+    leaflet::addPolygons(
+      data = limits_cum, color = "grey", fillOpacity = 0.1
+    ) %>%
+    leaflet::addPolygons(
+      data = buildings_cum, color = "black", fillOpacity = 0,
+      weight = 1,
+      label = ~name
+    ) %>% 
+    leaflet::addCircleMarkers(
+      label = ~name,
+      clusterOptions = leaflet::markerClusterOptions(),
+      radius = 6,
+      labelOptions = leaflet::labelOptions(textOnly = FALSE),
+      options = leaflet::popupOptions(closeButton = FALSE)
+    ) %>%
+    leaflet::addControl(
+      htmltools::span(
+        htmltools::tag("b", "Figura 2:"),
+        "Mapa de casos reportados en el CUM"
+      ),
+      position = "topright"
+    )
+
+} else {
+  static_cum_map <-  cum_cases %>%
+    count(name) %>%
+    ggplot() +
+    geom_sf(
+      data = buildings_cum
+    ) +
+    geom_sf(
+      aes(fill = n)
+    ) +
+    geom_sf(
+      data = cum_cases %>%
+        sf::st_set_geometry("point") %>%
+        sf::st_set_crs(4326),
+      size = 0.1, color = "red"
+    ) +
+    labs(
+      title = paste(
+        "Mapa mostrando las ubicaciones reportadas de acoso",
+        "\nen el Centro Universitario Metropolitano de USAC"
+      ),
+      fill = "Número de\nreportes"
+    ) +
+    scale_fill_viridis_c() +
+    theme(
+      legend.key.width = unit(2, "lines")
+    )
+  
+  plot(static_cum_map)
+}
+
+```
+
+
+
+
+```{r places_sample, fig.width=4, fig.height=4, eval=FALSE}
+
+dashboard_calle %>%
+  mutate(
+    harassment_place_rec = harassment_place_rec %>%
+      fct_relabel(
+        function(x) x %>%
+          gsub("( [(].+)|(cerca de )", "", .) %>%
+          gsub(".+(otros)", "otros", .) %>%
+          gsub(" (público|de buses)", "\n\\1", .)
+      )
+  ) %>%
+  ggplot() +
+  geom_bar(
+    aes(x = harassment_place_rec), fill = ocacgt_pal["gris"]
+  ) +
+  labs(
+    title = "Figura 2:\nLugares donde es más\nfrecuente el acoso.",
+    subtitle = paste(
+      "El acoso ocurre en todas partes, pero hay",
+      "lugares en donde es más frecuente. En la",
+      "gráfica de abajo puedes ver los tipos de",
+      "lugares más reportados en este estudio.",
+      sep = "\n"
+    ),
+    x = "Tipo de lugar\ndonde ocurrió el acoso",
+    y = "Número de reportes"
+  ) +
+  scale_y_continuous(expand = c(0, 0)) +
+  # coord_flip() +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5)
+  )
+```
+
+
+
+
+### **¿A quiénes afecta el acoso en USAC?** </br>El acoso en USAC afecta principalmente a mujeres.
+
+```{r}
+dashboard_usac %>%
+  mutate(
+    sexo = sexo %>%
+      recode(
+        Lesbiana = "Mujer",
+        queer = "Queer"
+      ) %>%
+      factor(
+        levels = c("Mujer", "Queer", "Hombre")
+      )
+  ) %>%
+  plot_square_waffle(
+    variable = sexo,
+    label = "Sexo de persona acosada",
+    colors = ocacgt_pal[c("amarillo", "morado", "gris")],
+    reverse = TRUE
+  ) +
+  labs(
+    title = "Figura x. Sexo de la persona acosada"
+  )
+```
+
+***
+
+```{r}
+dashboard_usac %>%
+  count(
+    "Orientación sexual" = tolower(sexual_orientation),
+    sort = TRUE
+  ) %>%
+  mutate(
+    p = paste(round(n / sum(n) * 100, 1), "%")
+  ) %>%
+  rename(
+    "Número de reportes" = n,
+    "Porcentaje" = p
+  ) %>%
+  kable(
+    caption = "**Tabla n:** Orientación sexual de las personas acosadas."
+  )
+
+ages <- dashboard_usac %>%
+  filter(!is.na(edad)) %>%
+  pull(edad) %>%
+  as.numeric() %>%
+  quantile(c(0.1, 0.9)) %>%
+  paste(., collapse = " y ")
+```
+
+
+
+
+### **¿A cuáles grupos de edad afecta en USAC?** </br>La mayoría de las personas acosadas son mujeres entre `r ages` años de edad.
+
+```{r}
+dashboard_usac %>%
+  filter(edad > 1) %>%
+  ggplot() +
+  geom_histogram(
+    aes(x = edad, fill = sexo),
+    binwidth = 1, center = 0.5
+  ) +
+  # Annotate with grids
+  geom_hline(
+    yintercept = dashboard_usac %>%
+      filter(edad > 1) %>%
+      count(edad) %>%
+      pull(n) %>%
+      max(na.rm = TRUE) %>%
+      seq(1, ., by = 5),
+    color = ocacgt_pal["blanco"], size = 0.3
+  ) +
+  geom_vline(
+    xintercept = seq(
+      min(dashboard_usac$edad[dashboard_usac$edad > 1], na.rm = TRUE),
+      max(dashboard_usac$edad, na.rm = TRUE)
+    ),
+    color = ocacgt_pal["blanco"], size = 0.3
+  ) +
+  labs(
+    title = "Figura x:\nNúmero de reportes por\nedad de persona acosada.",
+    x = "Edad en años",
+    y = "Número de reportes",
+    fill = "Sexo de la persona acosada"
+  ) +
+  scale_fill_manual(
+    values = set_names(ocacgt_pal[c("morado", "anaranjado", "gris")], NULL)
+  ) +
+  expand_limits(x = 10) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "horizontal"
+  )
+
+# Summarize ages
+ages_table_usac <- dashboard_usac %>%
+  filter(
+    !is.na(edad), edad > 1,
+    sexo %in% c("Mujer", "Hombre")
+  ) %>%
+  mutate(
+    age_group = cut(
+      edad,
+      breaks = seq(0, max(ceiling(edad / 10) * 10), by = 10)
+    ),
+    reporter_sex = recode(
+      sexo,
+      Hombre = "los hombres",
+      Mujer = "las mujeres"
+    )
+  ) %>%
+  group_by(reporter_sex, age_group) %>%
+  summarize(
+    min_age = min(edad),
+    n = n()
+  ) %>%
+  extract(
+    age_group, into = c("start", "end"), convert = TRUE,
+    regex = "([0-9]+)[^0-9]+([0-9]+)", remove = FALSE
+  ) %>%
+  mutate(
+    age_group = paste(
+      if_else(
+        start < 20,
+        min_age,
+        as.numeric(start) + 1
+      ),
+      end,
+      sep = " a "
+    ),
+    percent = round(n / sum(n) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  complete(
+    nesting(reporter_sex, age_group),
+    fill = list(n = 0, percent = 0)
+  )
+```
+
+
+***
+
+  
+Entre los reportes que se han recopilado en este estudio las edades han ido de
+`r paste(range(dashboard_usac$edad, na.rm = TRUE), collapse = " a ")` años y
+los grupos de edad que más han reportado acoso son
+`r ages_table %>% slice(which.max(percent)) %>% glue::glue_data("{age_group} años para {tolower(reporter_sex)}") %>% paste(collapse = ", y ")`.
+
+
+```{r}
+ages_counts_usac <- ages_table_usac %>%
+  ungroup() %>%
+  mutate(reporter_sex = gsub("l[oa]s ", "", reporter_sex)) %>%
+  split(.$reporter_sex) %>%
+  map(
+    .f = function(x) {
+      mutate(
+        x,
+        percent = paste0(percent, "%")
+      ) %>%
+        select(
+          "Grupo de edad (años)" = age_group,
+          "Reportes de acoso" = n,
+          "Porcentaje del total para el sexo" = percent
+        )
+    }
+  )
+```
+
+<!-- Tab links -->
+  
+<span style="color:#999999"><b>Tabla 1:</b> Reportes de acoso por grupo de edad, para cada sexo.</span>
+
+
+```{r, results='asis', eval=knitr::is_html_output()}
+cat(
+  '<div>',
+  '<ul class="nav nav-tabs">',
+  '<li class="active"><a data-toggle="tab" href="#e-mujeres-usac">Mujeres</a></li>',
+  '<li><a data-toggle="tab" href="#e-hombres-usac">Hombres</a></li>',
+  '</ul>',
+  '<div class="tab-content">',
+  '<div id="e-mujeres-usac" class="tab-pane fade in active">',
+  kable(ages_counts_usac$mujeres, caption = "**Mujeres**"),
+  '</div>',
+  '<div id="e-hombres-usac" class="tab-pane fade">',
+  kable(ages_counts_usac$hombres, caption = "**Hombres**"),
+  '</div>',
+  '</div>',
+  '</div>',
+  # '</div>',
+  sep = "\n"
+)
+```
+
+
+```{r, eval=!knitr::is_html_output()}
+kable(ages_counts_usac$mujeres, caption = "**Mujeres**")
+kable(ages_counts_usac$hombres, caption = "**Hombres**")
+```
+
+
+
+
+### **¿Quiénes perpetran el acoso callejero en USAC?** </br> Según los casos reportados, los hombres son quienes más realizan prácticas de acoso (`r #harassers$hombre`%), con relación a los casos registrados de mujeres acosadoras (`r #harassers$mujer`%).
+
+
+```{r}
+
+dashboard_usac %>%
+  mutate(
+    harasser_sex = harasser_sex %>%
+      factor(
+        levels = c("Mujer", "Hombre")
+      )
+  ) %>%
+  plot_square_waffle(
+    variable = harasser_sex,
+    label = "Sexo de persona acosadora",
+    colors = ocacgt_pal[c("morado", "gris")],
+    reverse = TRUE
+  ) +
+  labs(
+    title = "Figura x. Sexo de los perpetradores\nde acoso en USAC"
+  ) +
+  guides(
+    fill = guide_legend(nrow = 1, title.position = "top")
+  )
+```
+
+***
+
+
+### **¿Quiénes son los acosadores en USAC?** </br>En USAC, los acosadores a quienes se puede identificar son principalmente profesores y estudiantes.
+
+```{r}
+dashboard_usac %>%
+  mutate(
+    harasser_group = factor(
+      harasser_group,
+      levels = c(
+        "Profesor o Profesora", "Estudiante", "Personal administrativo",
+        "Auxiliar de cátedra", "Desconocido"
+      )
+    )
+  ) %>%
+  plot_square_waffle(
+    variable = harasser_group,
+    label = "Función de persona acosadora",
+    colors = ocacgt_pal[-length(ocacgt_pal)],
+    reverse = TRUE
+  ) +
+  labs(
+    title = "Figura x. Función de los perpetradores\nde acoso en USAC"
+  ) +
+  guides(
+    fill = guide_legend(nrow = 2, title.position = "top")
+  ) +
+  theme(
+    panel.background = element_rect(fill = "transparent")
+  )
+```
+
+***
+
+```{r}
+dashboard_usac %>%
+  filter(!is.na(harasser_reincident)) %>%
+  count("El acosador es reincidente" = harasser_reincident) %>%
+  mutate(
+    p =paste(round(n / sum(n) * 100), "%")
+  ) %>%
+  rename(
+    "Casos reportados" = n,
+    "Porcentaje" = p
+  ) %>%
+  kable(
+    caption = "**Tabla n:** Reincidencia de acosadores",
+    top = 0
+  )
+```
+
+
+
+
+### **¿Cuáles son los tipos de acoso más reportados en USAC?** </br>Los tipos de acoso más reportados son las miradas lascivas, y el llamado piropo, que son expresiones no solicitadas y violentas.
+
+***
+
+```{r}
+dashboard_usac %>%
+  separate_rows(tipos_de_acoso, sep = ";") %>%
+  count("Tipo de acoso" = tipos_de_acoso, sort = TRUE) %>%
+  slice(1:15) %>%
+  mutate(
+    p = paste(round(n / sum(n) * 100, 1), "%")
+  ) %>%
+  rename(
+    "Casos reportados" = n,
+    "Porcentaje" = p
+  ) %>%
+  kable(
+    caption = "**Tabla n:** Tipos de acoso"
+  )
+```
+
+
+
+
+### **¿Qué tan frecuente es el acoso en USAC?** </br>Aunque el acoso es reportado muchas veces, y en la calle típicamente sucede más de una vez al día<bold>*</bold>, la frecuencia reportada en USAC es menor.
+
+***
+
+```{r}
+dashboard_usac %>%
+  separate_rows(frecuencia_acoso, sep = ";") %>%
+  count("Tipo de acoso" = frecuencia_acoso, sort = TRUE) %>%
+  slice(1:15) %>%
+  mutate(
+    p = paste(round(n / sum(n) * 100, 1), "%")
+  ) %>%
+  rename(
+    "Casos reportados" = n,
+    "Porcentaje" = p
+  ) %>%
+  kable(
+    caption = "**Tabla n:** Frecuencia del acoso"
+  )
+```
+
+<bold>*</bold> El acoso en la calle sucede todos los dias según datos del estudio de acoso callejero de OCACGT, que puedes ver <a href="http://mapeo.ocacgt.org/indicadores.html#indicadores-del-acoso-callejero" target="_blank">aquí</a>.
+
+
+### **¿Cuáles efectos tiene el acoso en USAC?** </br>Las personas que han vivido el acoso en USAC reportan incomodidad, enojo, e inseguridad.
+
+***
+
+```{r}
+dashboard_usac %>%
+  separate_rows(efecto_acoso, sep = ";") %>%
+  mutate(
+    efecto_acoso = efecto_acoso %>%
+      tolower() %>%
+      sub("[^a-z]+$", "", .)
+  ) %>%
+  count("Efecto del acoso" = efecto_acoso, sort = TRUE) %>%
+  filter(n > 1) %>%
+  mutate(
+    p = paste(round(n / sum(n) * 100, 1), "%")
+  ) %>%
+  rename(
+    "Casos reportados" = n,
+    "Porcentaje" = p
+  ) %>%
+  kable(
+    caption = "**Tabla n:** Efecto del acoso"
+  )
+```
+
+
+### **¡Ayúdanos reportanto el acoso en USAC!**
+
+Denuncia acoso callejero en USAC aquí:
+<a href="http://ocacgt.org/mapeo-de-acoso-usac/" target="_blank">
+</br><img src="img/dashboard-btn_mapeoAcoso.png" style="height:100px"></br>http://ocacgt.org/mapeo-de-acoso-usac/</img>
+</a>
+
+
+
+
 **Estudio de acoso en el transporte público** {.storyboard}
 ===========================================================
 
@@ -1527,3 +2202,26 @@ if(knitr::is_html_output()){
   cat(".")
 }
 ```
+
+
+
+### Estudio USAC
+
+#### **Proyecto La Calle 2.0 OCACGT - FCAM**
+
+El proyecto La calle 2.0 busca aumentar el flujo de información relacionada al acoso
+callejero y su prevención, posicionar el acoso callejero como una forma de violencia
+sexual en el imaginario colectivo para que sea parte de la discusión y se cuestionen
+las prácticas y formas de relacionarnos en los espacios públicos. El proyecto también
+tiene como objetivos generar acciones para la prevención del acoso callejero desde
+estudiantes y docentes; crear herramientas (contenido, estudios, metodologías de
+taller) para el OCACGT y otras actoras dentro del movimiento de mujeres y/o
+feministas en la región.
+
+En el contexto de este proyecto, OCACGT colaboró con la AEU para analizar los datos del estudio exploratorio de acoso en USAC, diseñar un formulario para continuar con la recolección de reportes de acoso en la universidad, y preparar esta plataforma para la diseminación contínua de los datos recolectados.
+
+
+#### **Proyecto de mapeo de acoso de USAC**
+
+> Insertar aquí descripción proveída por AEU
+
