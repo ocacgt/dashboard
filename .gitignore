@@ -9,6 +9,7 @@
 data/
 docs/
 img/
+output/
 
 # Ignore output files
 *.html
