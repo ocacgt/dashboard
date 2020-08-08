@@ -233,6 +233,7 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
     department = Departamento,
     municipality = `Municipio del Departamento de Guatemala`,
     zone = `Zona de la Ciudad de Guatemala`,
+    place = `Nombre del lugar o alguna referencia`,
     harassment_location = paste0(
       ifelse(
         !is.na(Avenida),
@@ -246,7 +247,8 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
       ),
       ifelse(!is.na(zone), paste0(zone, " "), ""),
       ifelse(!is.na(municipality), paste0(municipality, ", "), ""),
-      ifelse(!is.na(department), department, "")
+      ifelse(!is.na(department), department, ""),
+      ifelse(!is.na(place), paste0(place, " "), "")
     )
   ) %>%
   select(
@@ -463,14 +465,31 @@ if(!file.exists(location_cache)){
   
   new_locations <- dashboard_calle %>%
     select(timestamp, harassment_location) %>%
-    anti_join(locations) %>%
     mutate(
-      location = map(harassment_location, ggmap::geocode, source = "google")
+      harassment_location = sub(" *$", "", harassment_location)
     ) %>%
-    unnest()
+    anti_join(locations) %>%
+    # mutate(
+    #   location = map(harassment_location, ggmap::geocode, source = "google")
+    # ) %>%
+    unnest() %>%
+    print()
   
-  # Update available locations
-  locations <- bind_rows(locations, new_locations)
+  if(nrow(new_locations) > 0){
+    
+    new_locations %>%
+      write_csv("locations.csv")
+    
+    stop("Revisar manualmente las ubiaciones en el archivo \"locations.csv\"")
+    
+    new_locations <- read_csv(file = "locations.csv")
+    
+    unlink(x = "locations.csv")
+    
+    # Update available locations
+    locations <- bind_rows(locations, new_locations)
+  }
+  
   saveRDS(locations, file = location_cache)
 }
 
