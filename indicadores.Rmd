@@ -81,6 +81,31 @@ if(knitr::is_html_output()){
   cat(
     "**¡Hola!**",
     "================================================",
+    "",
+    '<style>',
+    '.videoWrapper {',
+    '	position: relative;',
+    '	padding-bottom: 56.25%; /* 16:9 */',
+    '	padding-top: 25px;',
+    '	height: 0;',
+    '}',
+    '.videoWrapper iframe {',
+    '	position: absolute;',
+    '	top: 0;',
+    '	left: 0;',
+    '	width: 100%;',
+    '	height: 100%;',
+    '}',
+    '</style>',
+    '',
+    '',
+    '<div class="videoWrapper">',
+    '<iframe',
+    '  width="560" height="315" align="center"',
+    '  src="https://www.youtube.com/embed/NkrRpN_5GIo"',
+    '  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>',
+    '</iframe>',
+    '</div>',
     sep = "\n"
   )
 } else {
@@ -94,30 +119,6 @@ if(knitr::is_html_output()){
 ```
 
 
-<style>
-.videoWrapper {
-	position: relative;
-	padding-bottom: 56.25%; /* 16:9 */
-	padding-top: 25px;
-	height: 0;
-}
-.videoWrapper iframe {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-</style>
-
-
-<div class="videoWrapper">
-<iframe
-  width="560" height="315" align="center"
-  src="https://www.youtube.com/embed/NkrRpN_5GIo"
-  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-</iframe>
-</div>
 
 
 **Indicadores del acoso callejero** {.storyboard}
@@ -403,33 +404,40 @@ ages_counts <- ages_table %>%
   )
 ```
 
+
 <!-- Tab links -->
-<div>
+
 <span style="color:#999999"><b>Tabla 1:</b> Reportes de acoso por grupo de edad, para cada sexo.</span>
 
-```{r, results='asis'}
-if(knitr::is_html_output()){
-  cat(
-    '<ul class="nav nav-tabs">',
-    '<li class="active"><a data-toggle="tab" href="#e-mujeres">Mujeres</a></li>',
-    '<li><a data-toggle="tab" href="#e-hombres">Hombres</a></li>',
-    '</ul>',
-    sep = "\n"
-  )
-}
+
+```{r, results='asis', eval=knitr::is_html_output()}
+cat(
+'<div>',
+'<ul class="nav nav-tabs">',
+'<li class="active"><a data-toggle="tab" href="#e-mujeres">Mujeres</a></li>',
+'<li><a data-toggle="tab" href="#e-hombres">Hombres</a></li>',
+'</ul>',
+'<div class="tab-content">',
+'<div id="e-mujeres" class="tab-pane fade in active">',
+kable(ages_counts$mujeres, caption = "**Mujeres**"),
+'</div>',
+'<div id="e-hombres" class="tab-pane fade">',
+kable(ages_counts$hombres, caption = "**Hombres**"),
+'</div>',
+'</div>',
+'</div>',
+# '</div>',
+sep = "\n"
+)
 ```
 
-</div>
 
-<!-- Tab contents -->
-<div class="tab-content">
-  <div id="e-mujeres" class="tab-pane fade in active">
-  `r kable(ages_counts$mujeres, caption = "**Mujeres**")`
-  </div>
-  <div id="e-hombres" class="tab-pane fade">
-  `r kable(ages_counts$hombres, caption = "**Hombres**")`
-  </div>
-</div>
+```{r, eval=!knitr::is_html_output()}
+kable(ages_counts$mujeres, caption = "**Mujeres**")
+kable(ages_counts$hombres, caption = "**Hombres**")
+```
+
+
 
 
 ### **¿Quiénes perpetran el acoso callejero?** </br> Según los casos reportados, los hombres son quienes más realizan prácticas de acoso (`r harassers$hombre`%), con relación a los casos registrados de mujeres acosadoras (`r harassers$mujer`%).
@@ -630,34 +638,40 @@ types_counts <- harassment_counts %>%
   )
 ```
 
+
 <!-- Tab links -->
-<div>
+
 <span style="color:#999999"><b>Tabla 2:</b> Reportes de tipo de acoso para cada sexo.</span>
 
-```{r, results='asis'}
-if(knitr::is_html_output()){
-  cat(
-    '<ul class="nav nav-tabs">',
-    '<li class="active"><a data-toggle="tab" href="#ta-mujeres">Mujeres</a></li>',
-    '<li><a data-toggle="tab" href="#ta-hombres">Hombres</a></li>',
-    '</ul>',
-    sep = "\n"
-  )
-}
+
+```{r, results='asis', eval=knitr::is_html_output()}
+cat(
+'<div>',
+'<ul class="nav nav-tabs">',
+'<li class="active"><a data-toggle="tab" href="#ta-mujeres">Mujeres</a></li>',
+'<li><a data-toggle="tab" href="#ta-hombres">Hombres</a></li>',
+'</ul>',
+'<div class="tab-content">',
+'<div id="ta-mujeres" class="tab-pane fade in active">',
+kable(types_counts$Mujer, caption = "**Mujeres**"),
+'</div>',
+'<div id="ta-hombres" class="tab-pane fade">',
+kable(types_counts$Hombre, caption = "**Hombres**"),
+'</div>',
+'</div>',
+'</div>',
+# '</div>',
+sep = "\n"
+)
 ```
 
-</ul>
-</div>
 
-<!-- Tab contents -->
-<div class="tab-content">
-  <div id="ta-mujeres" class="tab-pane fade in active">
-  `r kable(types_counts$Mujer, caption = "**Mujeres**")`
-  </div>
-  <div id="ta-hombres" class="tab-pane fade">
-  `r kable(types_counts$Hombre, caption = "**Hombres**")`
-  </div>
-</div>
+```{r, eval=!knitr::is_html_output()}
+kable(types_counts$Mujer, caption = "**Mujeres**")
+kable(types_counts$Hombre, caption = "**Hombres**")
+```
+
+
 
 
 En el cuestionario es posible reportar varios tipos de acoso a la vez,
