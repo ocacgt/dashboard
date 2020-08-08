@@ -51,6 +51,7 @@ dashboard_usac <- acoso_usac %>%
     harasser_group = esta_persona_es,
     harasser_age = aquac_edad_aproximada_diraas_que_tiene_la_persona_acosadora,
     harasser_reincident = ahas_sido_acosadao_por_esa_persona_anteriormente,
+    harasser_name = si_la_persona_que_te_acosa3_fue_tu_profesora_escribe_su_nombre_te_recordamos_que_esta_encuesta_es_ana3nima,
     sexual_orientation = orientacia3n_sexual,
     frecuencia_acoso = acada_cuanto_sufres_alguna_forma_de_acoso_en_la_universidad,
     efecto_acoso = aquac_sentiste
@@ -70,8 +71,14 @@ dashboard_usac <- acoso_usac %>%
       ) %>%
       factor(
         levels = c("Mujer", "Queer", "Hombre")
-      )
+      ),
+    harasser_known = if_else(
+      condition = !is.na(harasser_name),
+      true = "Identidad de acosador conocida",
+      false = "Acosador no es reconocido"
+    )
   ) %>%
+  select(-harasser_name) %>%
   print()
 
 dashboard_usac %>%
