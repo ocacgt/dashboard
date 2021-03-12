@@ -1,5 +1,5 @@
 ---
-title: 'Indicadores de Acoso Callejero'
+title: 'Mapeos'
 output:
   flexdashboard::flex_dashboard:
     logo: img/logo-white.svg
@@ -130,7 +130,7 @@ if(knitr::is_html_output()){
 
 
 
-**Indicadores del acoso callejero** {.storyboard}
+**Acoso callejero** {.storyboard}
 ================================================
 
 
@@ -953,7 +953,7 @@ Denuncia acoso callejero en calles, parques y otros espacios públicos aquí:
 
 \newpage
 
-**Indicadores del acoso en USAC** {.storyboard}
+**Acoso en USAC** {.storyboard}
 ================================================
 
 
@@ -1709,7 +1709,7 @@ Denuncia acoso callejero en USAC aquí:
 
 \newpage
 
-**Estudio de acoso en el transporte público** {.storyboard}
+**Acoso en el transporte público** {.storyboard}
 ===========================================================
 
 
@@ -2133,7 +2133,7 @@ Denuncia acoso callejero en el transporte público aquí:
 
 \newpage
 
-**Acerca del proyecto**  {.storyboard}
+**Acerca de**  {.storyboard}
 ================================================
 
 
