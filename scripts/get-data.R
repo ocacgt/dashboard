@@ -539,9 +539,19 @@ if(!file.exists(location_cache)){
   new_locations <- dashboard_calle %>%
     select(timestamp, harassment_location) %>%
     mutate(
-      harassment_location = sub(" *$", "", harassment_location)
+      harassment_location = sub(" *$", "", harassment_location),
+      timestamp = timestamp %>%
+        lubridate::floor_date(unit = "minute") %>%
+        as.character()
     ) %>%
-    anti_join(locations) %>%
+    anti_join(
+      locations %>%
+        mutate(
+          timestamp = timestamp %>%
+            lubridate::floor_date(unit = "minute") %>%
+            as.character()
+        )
+    ) %>%
     # mutate(
     #   location = map(harassment_location, ggmap::geocode, source = "google")
     # ) %>%
