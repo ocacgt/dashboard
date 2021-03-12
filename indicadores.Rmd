@@ -2131,6 +2131,92 @@ Denuncia acoso callejero en el transporte público aquí:
 
 
 
+**¡Denuncia!** {.storyboard}
+===========================================================
+
+### Denuncia acoso callejero en calles, parques y otros espacios públicos aquí: <a href="http://ocacgt.org/mapeo-de-acoso-callejero/" target="_blank"> </br><img style="height:50%" src="img/dashboard-btn_mapeoAcoso.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero/</img> </a>
+
+
+### Denuncia acoso callejero en el transporte público aquí: <a href="http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/" target="_blank"></br><img style="height:50%" src="img/dashboard-btn_acosoTransporte.png"></br>http://ocacgt.org/mapeo-de-acoso-callejero-en-el-transporte/</img></a>
+
+
+### Denuncia el acoso en USAC aquí:
+
+
+
+
+<!-- Bloques para preparar y agregar el reporte -->
+```{r}
+if(knitr::is_html_output()){
+  setDownloadURI = function(
+    filename = stop("'filename' must be specified"),
+    textHTML = " ", fileext = "pdf", envir = parent.frame()
+  ){
+    
+    require(base64enc,quietly = TRUE)
+    divname = paste(sample(LETTERS),collapse="")
+    
+    filenameWithExt = paste(filename,fileext,sep=".")
+    
+    # Encode the report file
+    uri = dataURI(
+      file = filenameWithExt,
+      mime = "application/octet-stream", encoding = "base64"
+    )
+    
+    # # Delete report file
+    # file.remove(filenameWithExt)
+    
+    # Write download script
+    cat("<a style='text-decoration: none' id='",divname,"'></a>
+    <script>
+    var a = document.createElement('a');
+    var div = document.getElementById('",divname,"');
+    div.appendChild(a);
+    a.setAttribute('href', '",uri,"');
+    a.innerHTML = '",textHTML,"' + ' ",filenameWithExt,"';
+    if (typeof a.download != 'undefined') {
+      a.setAttribute('download', '",filenameWithExt,"');
+    }else{
+      a.setAttribute('onclick', 'confirm(\"Tu navegador no es compatible con esta función. Debes cambiar el nombre del archivo a ",filenameWithExt," después de descargarlo (o usar Chrome/Firefox/Opera). \")');
+    }
+    </script>",
+    sep="")
+  }
+}
+```
+
+
+
+
+```{r results='asis', echo=FALSE, message=FALSE}
+if(knitr::is_html_output()){
+  # # Allow duplicate chunk labels, since knitting within self
+  # options(knitr.duplicate.label = "allow")
+  # 
+  # 
+  # # Knit and render to pdf
+  # rmarkdown::render(
+  #   input = "content/indicadores.Rmd",
+  #   output_format = "pdf_document",
+  #   output_file = "reporte.pdf",
+  #   quiet = TRUE,
+  #   clean = TRUE
+  # )
+  cat("\n\n# **Descargar informes**\n\n")
+  cat("**Informe descargable:** \n\n")
+  cat("Descargar versión de impresión de todos los estudios: ")
+  cat("![](img/pdf-download.svg?display=inline-block)")
+  setDownloadURI(filename = "ocacgt-informeMapeo")
+  cat(".")
+}
+```
+
+
+
+
+
+
 \newpage
 
 **Acerca de**  {.storyboard}
@@ -2269,74 +2355,6 @@ En total hemos registrado `r nrow(dashboard_transporte)` reportes.
 <h3>¿Tienes alguna duda o deseas contactarnos?</h3>
 
 Escríbenos a hola@ocacgt.org.
-
-
-
-<!-- Bloques para preparar y agregar el reporte -->
-```{r}
-if(knitr::is_html_output()){
-  setDownloadURI = function(
-    filename = stop("'filename' must be specified"),
-    textHTML = " ", fileext = "pdf", envir = parent.frame()
-  ){
-    
-    require(base64enc,quietly = TRUE)
-    divname = paste(sample(LETTERS),collapse="")
-    
-    filenameWithExt = paste(filename,fileext,sep=".")
-    
-    # Encode the report file
-    uri = dataURI(
-      file = filenameWithExt,
-      mime = "application/octet-stream", encoding = "base64"
-    )
-    
-    # # Delete report file
-    # file.remove(filenameWithExt)
-    
-    # Write download script
-    cat("<a style='text-decoration: none' id='",divname,"'></a>
-    <script>
-    var a = document.createElement('a');
-    var div = document.getElementById('",divname,"');
-    div.appendChild(a);
-    a.setAttribute('href', '",uri,"');
-    a.innerHTML = '",textHTML,"' + ' ",filenameWithExt,"';
-    if (typeof a.download != 'undefined') {
-      a.setAttribute('download', '",filenameWithExt,"');
-    }else{
-      a.setAttribute('onclick', 'confirm(\"Tu navegador no es compatible con esta función. Debes cambiar el nombre del archivo a ",filenameWithExt," después de descargarlo (o usar Chrome/Firefox/Opera). \")');
-    }
-    </script>",
-    sep="")
-  }
-}
-```
-
-
-
-```{r results='asis', echo=FALSE, message=FALSE}
-if(knitr::is_html_output()){
-  # # Allow duplicate chunk labels, since knitting within self
-  # options(knitr.duplicate.label = "allow")
-  # 
-  # 
-  # # Knit and render to pdf
-  # rmarkdown::render(
-  #   input = "content/indicadores.Rmd",
-  #   output_format = "pdf_document",
-  #   output_file = "reporte.pdf",
-  #   quiet = TRUE,
-  #   clean = TRUE
-  # )
-  cat("\n\n### Descargar informe de los estudios\n\n")
-  cat("**Informe descargable:** \n\n")
-  cat("Descargar versión de impresión de ambos estudios: ")
-  cat("![](img/pdf-download.svg?display=inline-block)")
-  setDownloadURI(filename = "ocacgt-informeMapeo")
-  cat(".")
-}
-```
 
 
 
