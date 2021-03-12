@@ -1125,7 +1125,7 @@ ref %>%
   count(unit, sort = TRUE) %>%
   transmute(
     "Unidad académica" = unit,
-    "n (%)" = paste0(
+    "Cantidad (Porcentaje)" = paste0(
       n, " (", round(n / sum(n) * 100, 1), ")"
     )
   ) %>%
