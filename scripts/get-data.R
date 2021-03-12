@@ -200,16 +200,16 @@ dashboard_calle_anterior <- datos_calle %>%
     harassment_date = lubridate::dmy(harassment_date),
     # Fix times
     harassment_time_rec = ifelse(
-      test = is.na(hms::as_hms(harassment_time)),
+      test = is.na(lubridate::ymd_hms(paste(Sys.Date(), harassment_time))),
       yes = harassment_time %>%
         tolower() %>%
         ifelse(! . %in% harassment_times, "otro", .),
       # Fixed periods
       no = case_when(
-        hms::as_hms(harassment_time) < hms::as_hms("06:00:00") ~ "madrugada",
-        hms::as_hms(harassment_time) < hms::as_hms("12:00:00") ~ "mañana",
-        hms::as_hms(harassment_time) < hms::as_hms("18:00:00") ~ "tarde",
-        hms::as_hms(harassment_time) < hms::as_hms("23:59:59") ~ "noche"
+        lubridate::ymd_hms(paste(Sys.Date(), harassment_time)) < lubridate::ymd_hms(paste(Sys.Date(), "06:00:00")) ~ "madrugada",
+        lubridate::ymd_hms(paste(Sys.Date(), harassment_time)) < lubridate::ymd_hms(paste(Sys.Date(), "12:00:00")) ~ "mañana",
+        lubridate::ymd_hms(paste(Sys.Date(), harassment_time)) < lubridate::ymd_hms(paste(Sys.Date(), "18:00:00")) ~ "tarde",
+        lubridate::ymd_hms(paste(Sys.Date(), harassment_time)) < lubridate::ymd_hms(paste(Sys.Date(), "23:59:59")) ~ "noche"
       )
     ) %>%
       factor(., levels = harassment_times, ordered = TRUE),
