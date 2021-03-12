@@ -323,7 +323,7 @@ totals <- dashboard_calle %>%
 ages <- dashboard_calle %>%
   filter(reporter_sex == "Mujer") %>%
   pull(reporter_age) %>%
-  quantile(c(0.1, 0.9)) %>%
+  quantile(c(0.1, 0.9), na.rm = TRUE) %>%
   paste(., collapse = " y ")
   
 
@@ -1198,7 +1198,7 @@ ages <- dashboard_usac %>%
   filter(!is.na(edad)) %>%
   pull(edad) %>%
   as.numeric() %>%
-  quantile(c(0.1, 0.9)) %>%
+  quantile(c(0.1, 0.9), na.rm = TRUE) %>%
   paste(., collapse = " y ")
 ```
 
