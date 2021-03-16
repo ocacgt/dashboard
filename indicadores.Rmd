@@ -1000,6 +1000,14 @@ cases <- ref %>%
   )
 
 
+case_zones <- usac_zones %>% 
+  sf::st_join(cases) %>%
+  sf::st_set_geometry("point") %>%
+  sf::st_set_crs(4326) %>%
+  select(-geometry) %>%
+  count(id, zona)
+
+
 if(knitr::is_html_output()){
   # Set tile options
   base_tiles <- "carto-light"
@@ -1031,6 +1039,7 @@ if(knitr::is_html_output()){
       label = paste0(as.Date(marcatemporal), "</br>", name)
     ) %>%
     sf::st_set_geometry("point") %>%
+    sf::st_set_crs(value = 4326) %>%
     leaflet::leaflet(width = "100%", height = "100%") %>%
     leaflet::addTiles(
       options = leaflet::tileOptions(maxZoom = 19.9),
@@ -1065,8 +1074,7 @@ if(knitr::is_html_output()){
     count(name) %>%
     ggplot() +
     geom_sf(
-      data = buildings_usac %>%
-        filter(!grepl("centro experimental docente", name, ignore.case = TRUE))
+      data = usac_zones
     ) +
     geom_sf(
       aes(fill = n)
@@ -1076,6 +1084,11 @@ if(knitr::is_html_output()){
         sf::st_set_geometry("point") %>%
         sf::st_set_crs(4326),
       size = 0.1, color = "red"
+    ) +
+    geom_sf_label(
+      data = usac_zones,
+      aes(label = id),
+      size = 2, alpha = 0.5
     ) +
     labs(
       title = paste(
@@ -1093,6 +1106,13 @@ if(knitr::is_html_output()){
     )
   
   plot(static_map)
+  
+  usac_zones %>%
+    as.data.frame() %>%
+    select(Id = id, Zona = zona) %>%
+    knitr::kable(
+      caption = "Zonificación del campus central de la USAC"
+    )
 }
 
 ```

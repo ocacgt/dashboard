@@ -38,6 +38,15 @@ buildings_usac <- buildings_usac %>%
   )
 
 
+# Zonification by Ligia Ruiz
+usac_zones <- sf::read_sf("data/usac/zonas/zonas_usac.shp") %>%
+  sf::st_transform(crs = 4326) %>%
+  transmute(
+    id = 1:n(),
+    zona = ZON %>% tolower()
+  )
+
+
 # Write reference table
 buildings_usac %>%
   as.data.frame() %>%
