@@ -971,7 +971,7 @@ para actualizar esta información.
 \newpage
 
 
-```{r fig.width=8, fig.height=8.5}
+```{r fig.width=8, fig.height=8.5, results="asis"}
 
 set.seed(1)
 cases <- ref %>%
@@ -1093,7 +1093,7 @@ if(knitr::is_html_output()){
     labs(
       title = paste(
         "Mapa mostrando las ubicaciones reportadas de acoso",
-        "\nen el campus central de USAC"
+        "en el campus central de USAC"
       ),
       fill = "Número de\nreportes"
     ) +
@@ -1102,10 +1102,14 @@ if(knitr::is_html_output()){
       legend.position = c(1, 0.01),
       legend.justification = c(1, 0),
       legend.direction = "horizontal",
-      legend.key.width = unit(2, "lines")
+      legend.key.width = unit(2, "lines"),
+      axis.title = element_blank()
     )
   
   plot(static_map)
+  
+  # space between map and table
+  cat("\\vspace{0.5em}")
   
   usac_zones %>%
     as.data.frame() %>%
