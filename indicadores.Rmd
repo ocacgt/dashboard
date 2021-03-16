@@ -1054,6 +1054,15 @@ if(knitr::is_html_output()){
     leaflet::addPolygons(
       data = limits, color = "grey", fillOpacity = 0.1
     ) %>%
+    leaflet::addPolygons(
+      data = usac_zones, color = "black", fillOpacity = 0,
+      weight = 1, opacity = 0.5,
+      highlightOptions = leaflet::highlightOptions(
+        stroke = TRUE, color = "black", opacity = 1, weight = 3,
+        fill = FALSE
+      ),
+      label = ~ zona
+    ) %>%
     leaflet::addCircleMarkers(
       label = ~name,
       clusterOptions = leaflet::markerClusterOptions(),
