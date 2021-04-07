@@ -1036,7 +1036,10 @@ if(knitr::is_html_output()){
   
   cases %>%
     mutate(
-      label = paste0(as.Date(marcatemporal), "</br>", name)
+      label = marcatemporal %>%
+        sub("([0-9/-]+ [0-9:]+) .*", "\\1", .) %>%
+        lubridate::ymd_hms(tz = "America/Guatemala") %>%
+        paste0("</br>", name)
     ) %>%
     sf::st_set_geometry("point") %>%
     sf::st_set_crs(value = 4326) %>%
@@ -1054,21 +1057,22 @@ if(knitr::is_html_output()){
     leaflet::addPolygons(
       data = limits, color = "grey", fillOpacity = 0.1
     ) %>%
-    leaflet::addPolygons(
-      data = usac_zones, color = "black", fillOpacity = 0,
-      weight = 1, opacity = 0.5,
-      highlightOptions = leaflet::highlightOptions(
-        stroke = TRUE, color = "black", opacity = 1, weight = 3,
-        fill = FALSE
-      ),
-      label = ~ zona
-    ) %>%
     leaflet::addCircleMarkers(
-      label = ~name,
+      popup = ~ label,
       clusterOptions = leaflet::markerClusterOptions(),
       radius = 6,
-      labelOptions = leaflet::labelOptions(textOnly = FALSE),
-      options = leaflet::popupOptions(closeButton = FALSE)
+      labelOptions = labelOptions(textOnly = FALSE),
+      options = popupOptions(closeButton = FALSE)
+    ) %>%
+    leaflet::addPolygons(
+      data = usac_zones, color = "black", fillOpacity = 0,
+      weight = 1, opacity = 0.5, dashArray = "5 7",
+      highlightOptions = leaflet::highlightOptions(
+        stroke = TRUE, color = "black", opacity = 1, weight = 3,
+        fill = FALSE, dashArray = "1"
+      ),
+      label = ~ zona,
+      popup = ~ zona
     ) %>%
     leaflet::addControl(
       htmltools::span(
@@ -1083,7 +1087,8 @@ if(knitr::is_html_output()){
     count(name) %>%
     ggplot() +
     geom_sf(
-      data = usac_zones
+      data = usac_zones,
+      linetype = "dashed"
     ) +
     geom_sf(
       aes(fill = n)
