@@ -2,7 +2,7 @@
 title: 'Mapeos'
 output:
   flexdashboard::flex_dashboard:
-    logo: img/logo-white.svg
+    logo: img/logo-white-5.svg
     social: menu
     css: lib/ocacgt.css
     fig_mobile:
