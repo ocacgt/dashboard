@@ -47,6 +47,14 @@ usac_zones <- sf::read_sf("data/usac/zonas/zonas_usac.shp") %>%
   )
 
 
+# Academic units location
+schools_zones <- readxl::read_excel("data/escuelas-unidades.xlsx") %>%
+  rename(zona = Zona, unit = Unidad) %>%
+  mutate(
+    zona = sub("[?]", "", zona)
+  ) %>%
+  print()
+
 # Write reference table
 buildings_usac %>%
   as.data.frame() %>%

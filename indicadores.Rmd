@@ -1190,6 +1190,38 @@ usac_units %>%
 
 ```
 
+```{r include=FALSE}
+set.seed(1)
+
+# random points in each zone
+zones_cases <- schools_zones %>%
+  filter(!is.na(zona)) %>%
+  select(unit, zona) %>%
+  left_join(usac_units) %>%
+  group_by(zona) %>%
+  summarize(
+    n = sum(n)
+  ) %>%
+  left_join(usac_zones) %>%
+  sf::st_as_sf() %>%
+  print()
+
+schools_points <- zones_cases %>%
+  sf::st_sample(size = .$n, by_polygon = TRUE)
+
+schools_points %>%
+    ggplot() +
+    geom_sf(
+        data = usac_zones
+    ) +
+    geom_sf(
+        size = 0.1
+    )
+
+
+```
+
+
 
 
 
