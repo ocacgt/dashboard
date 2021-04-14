@@ -80,6 +80,11 @@ source(file = "scripts/get-data.R", encoding = "UTF8")
 source(file = "scripts/read-form-data.R", encoding = "UTF-8")
 source(file = "scripts/prepare-gis-data.R", encoding = "UTF-8")
 ref <- readxl::read_excel("output/locations_ref.xlsx")
+usac_units <- readxl::read_excel(
+  "output/locations_ref.xlsx", sheet = "units"
+) %>%
+  filter(unit != "Opción 20") %>%
+  print()
 ```
 
 
@@ -1159,12 +1164,23 @@ cum_cases <- ref %>%
   count(name)
 
 
-ref %>%
-  count(unit, sort = TRUE) %>%
+usac_units %>%
+  arrange(desc(n)) %>%
+  bind_rows(
+    summarize(
+      .,
+      unit = "**Total**",
+      n = sum(n)
+    )
+  ) %>%
   transmute(
     "Unidad académica" = unit,
-    "Cantidad (Porcentaje)" = paste0(
-      n, " (", round(n / sum(n) * 100, 1), ")"
+    "Cantidad (Porcentaje)" = if_else(
+      unit == "**Total**",
+      paste0("**", n, "**"),
+      paste0(
+        n, " (", round(n / sum(n) * 100, 1), ")"
+      )
     )
   ) %>%
   knitr::kable(
