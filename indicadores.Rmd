@@ -8,6 +8,8 @@ output:
     fig_mobile:
       - 3.75
       - 6.1
+    includes:
+      in_header: "lib/favicon.html" 
   pdf_document: default
 linkcolor: blue
 header-includes:
