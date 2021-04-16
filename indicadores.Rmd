@@ -1445,7 +1445,7 @@ kable(ages_counts_usac$hombres, caption = "**Hombres**")
 
 
 
-### **¿Quiénes perpetran el acoso callejero en USAC?** </br> Los hombres son quienes más acosan (`r #harassers$hombre`%), con relación a los casos registrados de mujeres acosadoras (`r #harassers$mujer`%).
+### **¿Quiénes perpetran el acoso callejero en USAC?** </br> Los hombres son quienes más acosan (`r harassers$hombre`%), con relación a los casos registrados de mujeres acosadoras (`r harassers$mujer`%).
 
 
 ```{r}
@@ -1545,7 +1545,7 @@ dashboard_usac %>%
 ### **¿Cuáles son los tipos de acoso más reportados en USAC?** </br>Los tipos de acoso más reportados son las miradas lascivas, y el llamado piropo, que son expresiones no solicitadas y violentas.
 
 
-```{r}
+```{r fig.height=8}
 # Count types
 harassment_counts <- dashboard_usac %>%
   separate_rows(tipos_de_acoso, sep = ";") %>%
@@ -2445,6 +2445,8 @@ En total hemos registrado `r nrow(dashboard_transporte)` reportes.
 Escríbenos a hola@ocacgt.org.
 
 
+\newpage
+
 
 ### Estudio USAC
 
@@ -2469,12 +2471,25 @@ Esperamos que la visibilización de estas violencias continúe generando indigna
 Queremos que las Universidades de Guatemala sean espacios seguros para todas.
 
 
-<span width="100%" style="position: absolute; bottom: 0; display:table; margin:0 auto;">
-<img src="img/logo-aeu-negro.png" height="200px"></img>
-<img src="img/logo-fcam.png" height="200px"></img>
+<span width="100%">
+<img src="img/logo-aeu-negro.png" width="300px"></img>
+<img src="img/logo-fcam.png" width="300px"></img>
 </span>
 
 
+```{r results='asis', out.width="0.5\\linewidth"}
+if(!knitr::is_html_output()){
+  knitr::include_graphics("img/logo-aeu-negro.png", dpi = 600)
+}
+```
+
+```{r results='asis', out.width="0.5\\linewidth"}
+if(!knitr::is_html_output()){
+  knitr::include_graphics("img/logo-fcam.png", dpi = 600)
+}
+```
+
+\newpage
 
 
 ### Colaboradoras
@@ -2495,7 +2510,7 @@ Coordinadora proyecto La Calle 2.0.
 
 
 #### Ana Sáenz y Molly Acevedo  
-Alianza con AEU.
+Alianza con la comisión de género de AEU.
 
  
 #### Oscar de León  
