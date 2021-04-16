@@ -115,3 +115,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .sbframe-commentary {
     width: 50%;
 }
+
+.image-container {
+  background-position: center top !important;
+}
