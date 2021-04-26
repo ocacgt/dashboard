@@ -82,11 +82,6 @@ source(file = "scripts/get-data.R", encoding = "UTF8")
 source(file = "scripts/read-form-data.R", encoding = "UTF-8")
 source(file = "scripts/prepare-gis-data.R", encoding = "UTF-8")
 ref <- readxl::read_excel("output/locations_ref.xlsx")
-usac_units <- readxl::read_excel(
-  "output/locations_ref.xlsx", sheet = "units"
-) %>%
-  filter(unit != "Opción 20") %>%
-  print()
 ```
 
 
@@ -980,10 +975,16 @@ para actualizar esta información.
 
 ```{r fig.width=8, fig.height=8.5, results="asis"}
 
+# pilot cases location
 set.seed(1)
-cases <- ref %>%
+old_cases <- ref %>%
   filter(!is.na(name)) %>%
   separate_rows(name, sep = ";") %>%
+  mutate(
+    marcatemporal = marcatemporal %>%
+        sub("([0-9/-]+ [0-9:]+) .*", "\\1", .) %>%
+        lubridate::ymd_hms(tz = "America/Guatemala")
+  ) %>%
   arrange(marcatemporal, name) %>%
   select(marcatemporal, location, name) %>%
   left_join(
@@ -1007,12 +1008,91 @@ cases <- ref %>%
   )
 
 
-case_zones <- usac_zones %>% 
-  sf::st_join(cases) %>%
-  sf::st_set_geometry("point") %>%
-  sf::st_set_crs(4326) %>%
-  select(-geometry) %>%
-  count(id, zona)
+
+# new cases location
+todas_zonas <- bind_rows(
+  usac_zones,
+  periferic
+)
+
+set.seed(1)
+new_cases <- dashboard_usac_nuevo %>%
+  filter(location_sede == "Campus Central") %>%
+  mutate(
+    zona = if_else(
+      location_building == "Periférico Universitario",
+      paste(location_zone, "= periferico"),
+      location_zone
+    )
+  ) %>%
+  # test cases for alternative matches
+  bind_rows(
+    tibble(
+      zona = c("veterinaria-zootecnia - periferico", NA)
+    )
+  ) %>%
+  select(marcatemporal, zona, name = location_building) %>% {
+    bind_rows(
+      # no building match
+      filter(., name %in% buildings_usac$name) %>%
+        mutate(type = "building matches") %>%
+        left_join(
+          buildings_usac %>%
+            select(name) %>%
+            as.data.frame()
+        ),
+      
+      # only zone match
+      filter(
+        .,
+        ! name %in% buildings_usac$name,
+        zona %in% todas_zonas$zona
+      ) %>%
+        mutate(type = "zone matches") %>%
+        left_join(
+          todas_zonas %>%
+            as.data.frame() %>%
+            select(zona, geometry)
+        ),
+      
+      # no matches
+      filter(
+        .,
+        ! name %in% buildings_usac$name,
+        ! zona %in% todas_zonas$zona
+      ) %>%
+        mutate(type = "no matches") %>%
+        left_join(
+          limits %>%
+            mutate(type = "no matches") %>%
+            select(type, geometry)
+        )
+    ) %>%
+      filter(!is.na(marcatemporal))
+  } %>%
+  arrange(marcatemporal) %>%
+  sf::st_as_sf(
+    sf_column_name = "geometry"
+  ) %>%
+  filter(!sf::st_is_empty(geometry)) %>%
+  mutate(
+    point = map2(
+      geometry, name,
+      ~ {
+        sf::st_sample(.x, size = 1)
+      }
+    ) %>%
+      purrr::flatten() %>%
+      sf::st_sfc(),
+    location = zona
+  )
+
+
+cases <- bind_rows(
+  old_cases,
+  new_cases
+)
+
 
 
 if(knitr::is_html_output()){
@@ -1044,8 +1124,6 @@ if(knitr::is_html_output()){
   cases %>%
     mutate(
       label = marcatemporal %>%
-        sub("([0-9/-]+ [0-9:]+) .*", "\\1", .) %>%
-        lubridate::ymd_hms(tz = "America/Guatemala") %>%
         paste0("</br>", name)
     ) %>%
     sf::st_set_geometry("point") %>%
@@ -1072,7 +1150,7 @@ if(knitr::is_html_output()){
       options = popupOptions(closeButton = FALSE)
     ) %>%
     leaflet::addPolygons(
-      data = usac_zones, color = "black", fillOpacity = 0,
+      data = todas_zonas, color = "black", fillOpacity = 0,
       weight = 1, opacity = 0.5, dashArray = "5 7",
       highlightOptions = leaflet::highlightOptions(
         stroke = TRUE, color = "black", opacity = 1, weight = 3,
@@ -1091,10 +1169,11 @@ if(knitr::is_html_output()){
 
 } else {
   static_map <-  cases %>%
+    # sf::st_set_geometry("point") %>%
     count(name) %>%
     ggplot() +
     geom_sf(
-      data = usac_zones,
+      data = todas_zonas,
       linetype = "dashed"
     ) +
     geom_sf(
@@ -1118,7 +1197,7 @@ if(knitr::is_html_output()){
       ),
       fill = "Número de\nreportes"
     ) +
-    scale_fill_viridis_c() +
+    scale_fill_viridis_c(direction = -1) +
     theme(
       legend.position = c(1, 0.01),
       legend.justification = c(1, 0),
@@ -1166,7 +1245,9 @@ cum_cases <- ref %>%
   count(name)
 
 
-usac_units %>%
+dashboard_usac %>%
+  count(unit) %>%
+  filter(unit != "Opción 20") %>%
   arrange(desc(n)) %>%
   bind_rows(
     summarize(
@@ -1188,41 +1269,7 @@ usac_units %>%
   knitr::kable(
     caption = "**Tabla 1:** Reportes de acoso según unidad académica"
   )
-
-
 ```
-
-```{r include=FALSE}
-set.seed(1)
-
-# random points in each zone
-zones_cases <- schools_zones %>%
-  filter(!is.na(zona)) %>%
-  select(unit, zona) %>%
-  left_join(usac_units) %>%
-  group_by(zona) %>%
-  summarize(
-    n = sum(n)
-  ) %>%
-  left_join(usac_zones) %>%
-  sf::st_as_sf() %>%
-  print()
-
-schools_points <- zones_cases %>%
-  sf::st_sample(size = .$n, by_polygon = TRUE)
-
-schools_points %>%
-    ggplot() +
-    geom_sf(
-        data = usac_zones
-    ) +
-    geom_sf(
-        size = 0.1
-    )
-
-
-```
-
 
 
 
