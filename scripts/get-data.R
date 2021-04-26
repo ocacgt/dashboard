@@ -74,7 +74,7 @@ if(use_archived & file.exists(calle_archive) & file.exists(transporte_archive)){
   datos_transporte <- readRDS(file = transporte_archive)
 } else {
   # Load used package
-  library(package = googlesheets)
+  library(package = googlesheets4)
   
   # Formularios anteriores ----
   
@@ -83,8 +83,9 @@ if(use_archived & file.exists(calle_archive) & file.exists(transporte_archive)){
     gs_read()
   
   # Formulario acoso en el transporte público
-  datos_transporte <- gs_title(x = "Acoso Callejero en el Transporte Público (respuestas)") %>%
-    gs_read()
+  # TODO: original file needs finding
+  # datos_transporte <- gs_title(x = "Acoso Callejero en el Transporte Público (respuestas)") %>%
+  #   gs_read()
   
   # Archivar los datos anteriores
   saveRDS(datos_calle, file = calle_archive)
@@ -98,19 +99,32 @@ if(file.exists(calle_snapshot) & file.exists(transporte_snapshot)){
   datos_transporte_nuevo <- readRDS(file = transporte_snapshot)
 } else {
   # Load used package
-  library(package = googlesheets)
+  library(package = googlesheets4)
+  
+  
+  # Authenticate with locally available token
+  googledrive::drive_auth(
+    email = "estudiosocacgt@gmail.com",
+    cache = "data/gargle-auth"
+  )
+  
+  gs4_auth(
+    email = "estudiosocacgt@gmail.com",
+    scopes = "https://www.googleapis.com/auth/spreadsheets",
+    cache = "data/gargle-auth"
+  )
   
   # Formulario acoso callejero
-  datos_calle_nuevo <- gs_title(
-    x = "formulario-MapeoAcosoCallejeroGt_2018 (Respuestas)"
+  datos_calle_nuevo <- gs4_find(
+    pattern = "MapeoAcosoCallejeroGt"
   ) %>%
-    gs_read()
+    read_sheet(col_types = "c")
   
   # Formulario acoso en el transporte público
-  datos_transporte_nuevo <- gs_title(
-    x = "formulario-AcosoCallejeroTransportePublico-2018 (Respuestas)"
+  datos_transporte_nuevo <- gs4_find(
+    pattern = "AcosoCallejeroTransportePublico"
   ) %>%
-    gs_read()
+    read_sheet()
   
   # Guardar un snapshot de los datos
   saveRDS(datos_calle_nuevo, file = calle_snapshot)
@@ -267,7 +281,6 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
   ) %>%
   # Fix coding
   mutate(
-    timestamp = lubridate::dmy_hms(timestamp),
     harassment_date = timestamp %>% as.Date(),
     # Consistent category for sex
     reporter_sex = recode(
@@ -330,8 +343,10 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
         "Diariamente" = "Una vez al dia",
         "Un par de veces en el año" = "Pocas veces al año"
       ) %>%
-      factor(levels = harassment_frequencies, ordered = TRUE)
-  )
+      factor(levels = harassment_frequencies, ordered = TRUE),
+    timestamp = lubridate::dmy_hms(timestamp)
+  ) %>%
+  print()
 
 
 # Join both old and new dataset ----
@@ -498,9 +513,7 @@ dashboard_transporte_nuevo <- datos_transporte_nuevo %>%
       recode(
         "Veintitrés" = "23"
       ) %>%
-      as.integer(),
-    # Fix dates
-    timestamp = lubridate::dmy_hms(timestamp)
+      as.integer()
   ) %>%
   print()
 
