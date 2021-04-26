@@ -1573,16 +1573,30 @@ dashboard_usac %>%
 
 ```{r}
 dashboard_usac %>%
-  filter(!is.na(harasser_reincident)) %>%
-  count("El acosador es reincidente" = harasser_reincident) %>%
-  mutate(
-    p =paste(round(n / sum(n) * 100), "%")
+  transmute(
+    harasser_group = factor(
+      harasser_group,
+      levels = c(
+        "Profesor o Profesora", "Estudiante", "Personal administrativo",
+        "Auxiliar de cátedra", "Desconocido"
+      )
+    ),
+    harasser_sex,
+    harasser_reincident
   ) %>%
-  rename(
-    "Casos reportados" = n,
-    "Porcentaje" = p
+  filter(complete.cases(.)) %>%
+  group_by(Grupo = harasser_group, harasser_sex) %>%
+  summarize(
+    text = paste0(
+      n(),
+      " (",
+      round(sum(harasser_reincident == "Sí") / n() * 100, 1),
+      "% reincidentes)"
+    )
   ) %>%
-  kable(
+  spread(harasser_sex, text) %>%
+  ungroup() %>%
+  knitr::kable(
     caption = "**Tabla 5:** Reincidencia de acosadores",
     top = 0
   )
