@@ -47,6 +47,51 @@ usac_zones <- sf::read_sf("data/usac/zonas/zonas_usac.shp") %>%
   )
 
 
+# Periferico universitario - zonificado
+
+periferic <- usac_zones %>%
+  sf::st_cast(to = "MULTILINESTRING") %>%
+  sf::st_segmentize(dfMaxLength = 5) %>%
+  sf::st_cast(to = "POINT") %>%
+  sf::st_intersection(
+    usac_zones %>%
+      sf::st_buffer(dist = 0.00001) %>%
+      sf::st_union() %>%
+      sf::st_boundary() %>%
+      # sf::st_sfc() %>%
+      # sf::st_sf() %>%
+      sf::st_buffer(dist = 0.00004)
+  ) %>%
+  group_by(zona) %>%
+  summarize(
+    do_union = FALSE
+  ) %>%
+  sf::st_cast("LINESTRING") %>%
+  sf::st_buffer(dist = 0.00015, singleSide = TRUE) %>%
+  sf::st_difference(
+    usac_zones %>%
+      sf::st_buffer(dist = 0.00001) %>%
+      sf::st_union()
+  ) %>%
+  sf::st_difference() %>%
+  mutate(
+    zona = paste(zona, "- periferico")
+  ) %>%
+  print()
+
+periferic %>%
+  ggplot() +
+  geom_sf(
+    aes(color = zona),
+    fill = "transparent"
+  ) +
+  geom_sf(
+    data = usac_zones,
+    fill = "transparent"
+  )
+
+
+
 # Academic units location
 schools_zones <- readxl::read_excel("data/escuelas-unidades.xlsx") %>%
   rename(zona = Zona, unit = Unidad) %>%
@@ -54,6 +99,7 @@ schools_zones <- readxl::read_excel("data/escuelas-unidades.xlsx") %>%
     zona = sub("[?]", "", zona)
   ) %>%
   print()
+
 
 # Write reference table
 buildings_usac %>%
