@@ -1,15 +1,15 @@
 ---
 title: 'Mapeos'
+date: '`r Sys.setlocale("LC_TIME", "es_GT.utf8");paste0("<small>Actualizado el ", format(Sys.Date(), format = "%d/%b/%Y"), "</small>")`'
 output:
   flexdashboard::flex_dashboard:
     logo: img/logo-white-5.svg
+    favicon: http://ocacgt.org/favicon.ico
     social: menu
     css: lib/ocacgt.css
     fig_mobile:
       - 3.75
       - 6.1
-    includes:
-      in_header: "lib/favicon.html" 
   pdf_document: default
 linkcolor: blue
 header-includes:
