@@ -15,3 +15,5 @@ LaTeX: pdfLaTeX
 AutoAppendNewline: Yes
 
 QuitChildProcessesOnExit: Yes
+
+SpellingDictionary: es_ES
