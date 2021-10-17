@@ -42,6 +42,9 @@ library(package = "tidyverse")
 library(package = "patchwork")
 library(package = "leaflet")
 
+# Switch off spherical geometry
+sf::sf_use_s2(FALSE)
+
 # Theme palette
 ocacgt_pal <- c(
   morado = "#851264",
