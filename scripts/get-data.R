@@ -568,7 +568,7 @@ if(!file.exists(location_cache)){
     # mutate(
     #   location = map(harassment_location, ggmap::geocode, source = "google")
     # ) %>%
-    unnest() %>%
+    # unnest() %>%
     print()
   
   if(nrow(new_locations) > 0){
