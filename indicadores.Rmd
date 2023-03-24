@@ -1,6 +1,6 @@
 ---
 title: 'Mapeos'
-date: '`r Sys.setlocale("LC_TIME", "es_GT.utf8");paste0("<small>Actualizado el ", format(Sys.Date(), format = "%d/%b/%Y"), "</small>")`'
+date: '`r paste0("<small>Actualizado el ", format(Sys.Date(), format = "%d/%b/%Y"), "</small>")`'
 output:
   flexdashboard::flex_dashboard:
     logo: img/logo-white-5.svg
@@ -159,7 +159,7 @@ if(knitr::is_html_output()){
   # Set tile options
   base_tiles <- "carto-light"
   
-  tiles <- frame_data(
+  tiles <- tribble(
     ~tile,         ~url,
     "wikimedia",   "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
     "transport",   "http://{s}.tile.opencyclemap.org/transport/{z}/{x}/{y}.png",
@@ -1103,7 +1103,7 @@ if(knitr::is_html_output()){
   # Set tile options
   base_tiles <- "carto-light"
   
-  tiles <- frame_data(
+  tiles <- tribble(
     ~tile,         ~url,
     "wikimedia",   "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
     "transport",   "http://{s}.tile.opencyclemap.org/transport/{z}/{x}/{y}.png",

@@ -263,6 +263,17 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
       ifelse(!is.na(municipality), paste0(municipality, ", "), ""),
       ifelse(!is.na(department), department, ""),
       ifelse(!is.na(place), paste0(place, " "), "")
+    ),
+    
+    # fixes
+    department = case_when(
+      `Marca temporal` == "8/12/2022 8:50:31" ~ "Guatemala"
+    ),
+    municipality = case_when(
+      `Marca temporal` == "8/12/2022 8:50:31" ~ "Guatemala"
+    ),
+    zone = case_when(
+      `Marca temporal` == "8/12/2022 8:50:31" ~ "Zona 10"
     )
   ) %>%
   select(
@@ -366,7 +377,7 @@ if(interactive()){
         slice(1) %>%
         mutate_at(
           vars(-matches(".set")),
-          funs(paste(class(.), collapse = ";"))
+          list(~paste(class(.), collapse = ";"))
         )
     ) %>%
     bind_rows() %>%
