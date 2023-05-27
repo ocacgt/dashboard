@@ -267,13 +267,16 @@ dashboard_calle_nuevo <- datos_calle_nuevo %>%
     
     # fixes
     department = case_when(
-      `Marca temporal` == "8/12/2022 8:50:31" ~ "Guatemala"
+      `Marca temporal` == "8/12/2022 8:50:31" ~ "Guatemala",
+      TRUE ~ department
     ),
     municipality = case_when(
-      `Marca temporal` == "8/12/2022 8:50:31" ~ "Guatemala"
+      `Marca temporal` == "8/12/2022 8:50:31" ~ "Guatemala",
+      TRUE ~ department
     ),
     zone = case_when(
-      `Marca temporal` == "8/12/2022 8:50:31" ~ "Zona 10"
+      `Marca temporal` == "8/12/2022 8:50:31" ~ "Zona 10",
+      TRUE ~ department
     )
   ) %>%
   select(
@@ -575,6 +578,10 @@ if(!file.exists(location_cache)){
             lubridate::floor_date(unit = "minute") %>%
             as.character()
         )
+    ) %>%
+    mutate(
+      lon = NA_real_,
+      lat = NA_real_
     ) %>%
     # mutate(
     #   location = map(harassment_location, ggmap::geocode, source = "google")
