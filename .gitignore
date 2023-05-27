@@ -17,6 +17,8 @@ output/
 *.doc*
 *.tex
 *.zip
+*.xls*
+*.log
 
 # Ignore R scripts - have to explicitly add
 *.R
