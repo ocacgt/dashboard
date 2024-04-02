@@ -116,9 +116,9 @@ if(knitr::is_html_output()){
     '<div class="videoWrapper">',
     '<iframe',
     '  width="560" height="315" align="center"',
-    '  src="https://www.youtube.com/embed/NkrRpN_5GIo"',
+    '  src="https://www.youtube.com/embed/NkrRpN_5GIo?si=LTB5oBQufGQ-NyXE"',
     '  data-external="1"',
-    '  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>',
+    '  frameborder="0" allow="autoplay; encrypted-media; web-share" allowfullscreen>',
     '</iframe>',
     '</div>',
     sep = "\n"
