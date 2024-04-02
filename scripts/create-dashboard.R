@@ -12,6 +12,13 @@ rmarkdown::render(
   encoding = "UTF8"
 )
 
+# Knit dashboard
+rmarkdown::render(
+  input = "indicadores.Rmd",
+  output_file = "index.html",
+  encoding = "UTF8"
+)
+
 # Knit and render report to word
 rmarkdown::render(
   input = "indicadores.Rmd",
@@ -21,6 +28,3 @@ rmarkdown::render(
   clean = TRUE,
   encoding = "UTF8"
 )
-
-# Knit dashboard
-rmarkdown::render(input = "indicadores.Rmd", encoding = "UTF8")
